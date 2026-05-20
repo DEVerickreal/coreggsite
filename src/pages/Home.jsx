@@ -21,7 +21,7 @@ function Home() {
 
   async function loadSettings() {
     try {
-      const response = await fetch('${API_URL}/api/settings')
+      const response = await fetch(`${API_URL}/api/settings`)
       const data = await response.json()
 
       setSettings({
@@ -37,7 +37,7 @@ function Home() {
 
   async function loadNews() {
     try {
-      const response = await fetch('${API_URL}/api/news')
+      const response = await fetch(`${API_URL}/api/news`)
       const data = await response.json()
 
       setNews(data.slice(0, 9))

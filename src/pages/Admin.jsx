@@ -93,7 +93,8 @@ function Admin({ adminSection }) {
 
     formData.append('image', file)
 
-    const response = await fetch('${API_URL}/api/upload/home-image', {
+    const response = await fetch(
+    const response = await fetch(`${API_URL}/api/upload/home-image`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`
@@ -125,7 +126,7 @@ function Admin({ adminSection }) {
         }
       }
 
-      const response = await fetch('${API_URL}/api/settings', {
+      const response = await fetch(`${API_URL}/api/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ function Admin({ adminSection }) {
       homeBannerImage: ''
     }
 
-    const response = await fetch('${API_URL}/api/settings', {
+    const response = await fetch(`${API_URL}/api/settings`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -202,7 +203,7 @@ function Admin({ adminSection }) {
         body: formData
       })
     } else {
-      response = await fetch('${API_URL}/api/news', {
+      response = await fetch(`${API_URL}/api/news`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -256,7 +257,7 @@ function Admin({ adminSection }) {
   }
 
   async function saveNewsOrder(updatedNews) {
-    await fetch('${API_URL}/api/news/order', {
+    await fetch(`${API_URL}/api/news/order`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

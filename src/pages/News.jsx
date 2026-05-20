@@ -10,7 +10,7 @@ function News() {
   const [news, setNews] = useState([])
 
   async function loadNews() {
-    const response = await fetch('${API_URL}/api/news')
+    const response = await fetch(`${API_URL}/api/news`)
     const data = await response.json()
 
     setNews(data)

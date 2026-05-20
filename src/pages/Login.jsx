@@ -19,7 +19,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        '${API_URL}/api/login',
+        `${API_URL}/api/login`,
         {
           method: 'POST',
           headers: {
