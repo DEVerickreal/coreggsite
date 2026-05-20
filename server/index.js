@@ -2,15 +2,21 @@ import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import path from 'path'
-import fs from 'fs'
 import Database from 'better-sqlite3'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import { v2 as cloudinary } from 'cloudinary'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import { fileURLToPath } from 'url'
 
 dotenv.config()
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,20 +28,10 @@ const JWT_SECRET = 'coregg_super_secret_admin'
 const DISCORD_CONTACT_WEBHOOK =
   'https://discord.com/api/webhooks/1504216019961511978/ax0a-WICFMYyBXbp6rbLHbfWGuJcf3eYMb87JYgf8i8d5oPEKGHbjPljXX_YmWHY7nVK'
 
-const uploadsPath = path.join(__dirname, '../uploads')
-
-if (!fs.existsSync(uploadsPath)) {
-  fs.mkdirSync(uploadsPath, {
-    recursive: true
-  })
-}
+const db = new Database('database.db')
 
 app.use(cors())
 app.use(express.json())
-
-app.use('/uploads', express.static(uploadsPath))
-
-const db = new Database('database.db')
 
 function authAdmin(req, res, next) {
   const authHeader = req.headers.authorization
@@ -73,98 +69,12 @@ db.prepare(`
   )
 `).run()
 
-const newsColumns = db.prepare(`PRAGMA table_info(news)`).all()
-
-const hasFeatured = newsColumns.some((column) => column.name === 'featured')
-const hasViews = newsColumns.some((column) => column.name === 'views')
-const hasPosition = newsColumns.some((column) => column.name === 'position')
-
-if (!hasFeatured) {
-  db.prepare(`
-    ALTER TABLE news
-    ADD COLUMN featured INTEGER DEFAULT 0
-  `).run()
-}
-
-if (!hasViews) {
-  db.prepare(`
-    ALTER TABLE news
-    ADD COLUMN views INTEGER DEFAULT 0
-  `).run()
-}
-
-if (!hasPosition) {
-  db.prepare(`
-    ALTER TABLE news
-    ADD COLUMN position INTEGER DEFAULT 0
-  `).run()
-}
-
-const newsWithoutPosition = db
-  .prepare(`
-    SELECT id
-    FROM news
-    WHERE position IS NULL
-       OR position = 0
-    ORDER BY id DESC
-  `)
-  .all()
-
-if (newsWithoutPosition.length > 0) {
-  newsWithoutPosition.forEach((item, index) => {
-    db.prepare(`
-      UPDATE news
-      SET position = ?
-      WHERE id = ?
-    `).run(index + 1, item.id)
-  })
-}
-
 db.prepare(`
   CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
     value TEXT
   )
 `).run()
-
-const defaultSettings = {
-  siteName: 'COREGG',
-  siteSubtitle: 'ORGANIZAÇÃO DE E-SPORTS',
-  siteDescription: 'Organização de esports, creators e GTA RP.',
-
-  homeButtonText: 'Conheça a COREGG',
-  homeButtonLink: '/creators',
-
-  homeBannerImage: '',
-  homeHighlightImage: '',
-
-  homeHighlightTitle: '',
-  homeHighlightText: '',
-  homeHighlightActive: 'false',
-
-  discordLink: '#',
-  instagramLink: '#',
-  tiktokLink: '#',
-  youtubeLink: '#',
-
-  contactEmail: 'contato@coregg.com.br'
-}
-
-Object.entries(defaultSettings).forEach(([key, value]) => {
-  const exists = db
-    .prepare('SELECT * FROM settings WHERE key = ?')
-    .get(key)
-
-  if (!exists) {
-    db.prepare(`
-      INSERT INTO settings (
-        key,
-        value
-      )
-      VALUES (?, ?)
-    `).run(key, value)
-  }
-})
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS admins (
@@ -190,26 +100,26 @@ if (!adminExists) {
   `).run('admin@coregg.com', hashedPassword)
 }
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsPath)
-  },
+const storage = new CloudinaryStorage({
+  cloudinary,
 
-  filename: function (req, file, cb) {
-    const cleanOriginalName = file.originalname
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9.\-_]/g, '')
+  params: {
+    folder: 'coregg',
 
-    const uniqueName = `${Date.now()}-${cleanOriginalName}`
-
-    cb(null, uniqueName)
+    allowed_formats: [
+      'jpg',
+      'jpeg',
+      'png',
+      'webp'
+    ]
   }
 })
 
 const upload = multer({
   storage,
+
   limits: {
-    fileSize: 10 * 1024 * 1024
+    fileSize: 50 * 1024 * 1024
   },
 
   fileFilter: (req, file, cb) => {
@@ -270,35 +180,43 @@ app.post('/api/contact', async (req, res) => {
 
     const discordMessage = {
       username: 'COREGG Site',
+
       embeds: [
         {
           title: '📩 Novo contato recebido',
+
           color: 55807,
+
           fields: [
             {
               name: 'Nome',
               value: name,
               inline: true
             },
+
             {
               name: 'E-mail',
               value: email,
               inline: true
             },
+
             {
               name: 'Assunto',
               value: subject,
               inline: false
             },
+
             {
               name: 'Mensagem',
               value: message,
               inline: false
             }
           ],
+
           footer: {
             text: 'Formulário oficial do site COREGG'
           },
+
           timestamp: new Date().toISOString()
         }
       ]
@@ -306,9 +224,11 @@ app.post('/api/contact', async (req, res) => {
 
     const response = await fetch(DISCORD_CONTACT_WEBHOOK, {
       method: 'POST',
+
       headers: {
         'Content-Type': 'application/json'
       },
+
       body: JSON.stringify(discordMessage)
     })
 
@@ -349,6 +269,7 @@ app.put('/api/settings', authAdmin, (req, res) => {
       value
     )
     VALUES (?, ?)
+
     ON CONFLICT(key) DO UPDATE SET
     value = excluded.value
   `)
@@ -367,6 +288,9 @@ app.post(
   authAdmin,
   upload.single('image'),
   (req, res) => {
+
+    console.log(req.file)
+
     if (!req.file) {
       return res.status(400).json({
         error: 'Imagem não enviada'
@@ -374,7 +298,7 @@ app.post(
     }
 
     res.json({
-      image: `/uploads/${req.file.filename}`
+      image: req.file.path
     })
   }
 )
@@ -425,6 +349,10 @@ app.post(
   authAdmin,
   upload.single('image'),
   (req, res) => {
+
+    console.log('=== FILE ===')
+    console.log(req.file)
+
     const {
       title,
       category,
@@ -439,7 +367,7 @@ app.post(
     }
 
     const image = req.file
-      ?`/uploads/${req.file.filename}`
+      ? req.file.path
       : null
 
     const lastPosition = db
@@ -476,7 +404,8 @@ app.post(
 
     res.json({
       success: true,
-      id: result.lastInsertRowid
+      id: result.lastInsertRowid,
+      image
     })
   }
 )
@@ -510,6 +439,9 @@ app.put(
   authAdmin,
   upload.single('image'),
   (req, res) => {
+
+    console.log('UPDATE FILE:', req.file)
+
     const { id } = req.params
 
     const {
@@ -529,14 +461,8 @@ app.put(
       })
     }
 
-    if (!title || !category || !description || !content) {
-      return res.status(400).json({
-        error: 'Preencha todos os campos da notícia.'
-      })
-    }
-
     const image = req.file
-      ?`/uploads/${req.file.filename}`
+      ? req.file.path
       : currentNews.image
 
     db.prepare(`
@@ -558,7 +484,8 @@ app.put(
     )
 
     res.json({
-      success: true
+      success: true,
+      image
     })
   }
 )
@@ -577,6 +504,9 @@ app.delete('/api/news/:id', authAdmin, (req, res) => {
 })
 
 app.use((err, req, res, next) => {
+
+  console.log(err)
+
   if (err instanceof multer.MulterError) {
     return res.status(400).json({
       error: err.message

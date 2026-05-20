@@ -471,14 +471,16 @@ function Admin({ adminSection }) {
                     key={item.id}
                     className="adminNewsItem"
                   >
-                    <img
-                      src={
-                        item.image
-                          ? item.image
-                          : '/favicon.png'
-                      }
-                      alt={item.title}
-                    />
+<img
+  src={
+    item.image
+      ? item.image.startsWith('http')
+        ? item.image
+        : `${API_URL}${item.image}`
+      : '/favicon.png'
+  }
+  alt={item.title}
+/>
 
                     <div className="adminNewsInfo">
                       <span>{item.category}</span>
