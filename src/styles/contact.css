@@ -1,0 +1,377 @@
+.contactPremiumPage {
+  min-height: 100vh;
+  padding: 120px 50px 90px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 217, 255, 0.10), transparent 35%),
+    #050505;
+  overflow: hidden;
+}
+
+.contactHeroPremium {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  align-items: center;
+  gap: 60px;
+  border-radius: 34px;
+  padding: 60px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(0, 217, 255, 0.10), rgba(0, 0, 0, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.contactHeroGlow {
+  position: absolute;
+  width: 560px;
+  height: 560px;
+  background: rgba(0, 217, 255, 0.12);
+  filter: blur(160px);
+  left: -200px;
+  top: -200px;
+}
+
+.contactHeroImage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 420px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #050505;
+}
+
+.contactHeroImage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent);
+}
+
+.contactHeroImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 28px;
+  background: #050505;
+}
+
+.contactHeroPremium > div:last-child,
+.contactHeroPremium > .reveal:last-child {
+  position: relative;
+  z-index: 3;
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contactMiniTitle {
+  color: #00d9ff;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 4px;
+}
+
+.contactHeroPremium h1 {
+  margin-top: 20px;
+  font-size: 68px;
+  line-height: 72px;
+  color: #00d9ff;
+  font-weight: 900;
+}
+
+.contactHeroPremium p {
+  margin-top: 24px;
+  max-width: 620px;
+  color: #d0d0d0;
+  font-size: 20px;
+  line-height: 34px;
+}
+
+.contactHeroButtons {
+  margin-top: 34px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.contactPrimaryButton,
+.contactSecondaryButton {
+  height: 58px;
+  padding: 0 34px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.contactPrimaryButton {
+  background: #00d9ff;
+  color: black;
+}
+
+.contactSecondaryButton {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: white;
+}
+
+.contactPrimaryButton:hover,
+.contactSecondaryButton:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.15);
+}
+
+.contactCardsGrid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.contactInfoCard {
+  min-height: 260px;
+  padding: 34px;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #0c0c0c, #050505);
+  border: 1px solid #151515;
+  transition: 0.3s;
+}
+
+.contactInfoCard:hover {
+  transform: translateY(-6px);
+  border-color: #00d9ff;
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.10);
+}
+
+.contactCardTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.contactCardTop svg {
+  color: #00d9ff;
+  font-size: 22px;
+}
+
+.contactCardTop span {
+  color: #00d9ff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.contactInfoCard h3 {
+  font-size: 32px;
+}
+
+.contactInfoCard p {
+  margin-top: 18px;
+  color: #a8a8a8;
+  line-height: 32px;
+  font-size: 16px;
+}
+
+/* ÁREA PRINCIPAL CORRIGIDA */
+
+.contactMainArea {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.contactFormBox,
+.contactCommunityBox {
+  width: 100%;
+  height: 100%;
+  min-height: 640px;
+  padding: 40px;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #0d0d0d, #050505);
+  border: 1px solid #151515;
+}
+
+.contactFormBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.contactCommunityBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.contactSectionHeader span,
+.contactCommunityBox > span {
+  color: #00d9ff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.contactSectionHeader h2,
+.contactCommunityBox h2 {
+  margin-top: 16px;
+  font-size: 42px;
+  line-height: 48px;
+}
+
+.contactSectionHeader p,
+.contactCommunityBox p {
+  margin-top: 18px;
+  color: #aaa;
+  line-height: 32px;
+  font-size: 17px;
+}
+
+.contactForm {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+
+.contactForm input,
+.contactForm select,
+.contactForm textarea {
+  width: 100%;
+  background: #090909;
+  border: 1px solid #1d1d1d;
+  border-radius: 18px;
+  padding: 22px;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+.contactForm textarea {
+  min-height: 220px;
+  resize: none;
+  flex: 1;
+}
+
+.contactForm input:focus,
+.contactForm select:focus,
+.contactForm textarea:focus {
+  border-color: #00d9ff;
+}
+
+.contactForm button {
+  height: 62px;
+  border: none;
+  border-radius: 18px;
+  background: #00d9ff;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contactForm button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.18);
+}
+
+.contactSocialGrid {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contactSocialGrid a {
+  height: 68px;
+  padding: 0 24px;
+  border-radius: 18px;
+  background: #090909;
+  border: 1px solid #1d1d1d;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-weight: bold;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.contactSocialGrid a svg {
+  color: #00d9ff;
+  font-size: 22px;
+}
+
+.contactSocialGrid a:hover {
+  border-color: #00d9ff;
+  transform: translateX(6px);
+}
+
+.contactStatus {
+  color: #00d9ff;
+  font-weight: bold;
+}
+
+@media (max-width: 1200px) {
+  .contactHeroPremium {
+    grid-template-columns: 1fr;
+  }
+
+  .contactCardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contactMainArea {
+    grid-template-columns: 1fr;
+  }
+
+  .contactFormBox,
+  .contactCommunityBox {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .contactPremiumPage {
+    padding: 120px 22px 80px;
+  }
+
+  .contactHeroPremium {
+    padding: 28px;
+  }
+
+  .contactHeroImage {
+    height: 260px;
+  }
+
+  .contactHeroPremium h1 {
+    font-size: 42px;
+    line-height: 48px;
+  }
+
+  .contactHeroPremium p {
+    font-size: 16px;
+    line-height: 30px;
+  }
+
+  .contactSectionHeader h2,
+  .contactCommunityBox h2 {
+    font-size: 32px;
+    line-height: 38px;
+  }
+
+  .contactFormBox,
+  .contactCommunityBox {
+    padding: 28px;
+  }
+}
