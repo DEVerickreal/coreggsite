@@ -1,3 +1,3 @@
-const API_URL = 'http://localhost:3001'
+const API_URL = 'https://coregg-api.onrender.com'
 
 export default API_URL
