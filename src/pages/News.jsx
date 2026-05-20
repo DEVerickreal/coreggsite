@@ -4,11 +4,13 @@ import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
 import NewsCard from '../components/NewsCard'
 
+import API_URL from '../api'
+
 function News() {
   const [news, setNews] = useState([])
 
   async function loadNews() {
-    const response = await fetch('/api/news')
+    const response = await fetch('${API_URL}/api/news')
     const data = await response.json()
 
     setNews(data)

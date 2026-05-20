@@ -2,6 +2,8 @@ import '../styles/contact.css'
 
 import { useState } from 'react'
 
+import API_URL from '../api'
+
 import {
   FaDiscord,
   FaInstagram,
@@ -30,7 +32,7 @@ function Contact() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('${API_URL}/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

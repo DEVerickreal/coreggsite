@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 import '../styles/login.css'
 
+import API_URL from '../api'
+
 function Login() {
   const navigate = useNavigate()
 
@@ -17,7 +19,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        '/api/login',
+        '${API_URL}/api/login',
         {
           method: 'POST',
           headers: {

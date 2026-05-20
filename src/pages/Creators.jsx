@@ -1,6 +1,8 @@
 import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
 
+import API_URL from '../api'
+
 function Creators() {
   return (
     <PageTransition>

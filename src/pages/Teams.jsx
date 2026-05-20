@@ -6,6 +6,8 @@ import TeamCard from '../components/TeamCard'
 
 import teams from '../data/teams'
 
+import API_URL from '../api'
+
 function Teams() {
   return (
     <PageTransition>

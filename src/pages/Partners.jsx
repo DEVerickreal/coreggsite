@@ -4,6 +4,8 @@ import Reveal from '../components/Reveal'
 import ifynnaLogo from '../assets/ifynna.png'
 import maisVidaLogo from '../assets/maisvida.png'
 
+import API_URL from '../api'
+
 function Partners() {
   return (
     <PageTransition>

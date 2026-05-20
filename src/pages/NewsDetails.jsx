@@ -4,6 +4,8 @@ import { Link, useParams } from 'react-router-dom'
 import PageTransition from '../components/PageTransition'
 import NewsCard from '../components/NewsCard'
 
+import API_URL from '../api'
+
 function NewsDetails() {
   const { id } = useParams()
 
@@ -17,7 +19,7 @@ function NewsDetails() {
   }
 
   async function loadNews() {
-    const response = await fetch('/api/news')
+    const response = await fetch('${API_URL}/api/news')
     const data = await response.json()
 
     setNews(data)
