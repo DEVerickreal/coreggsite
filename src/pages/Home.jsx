@@ -11,7 +11,7 @@ function Home() {
   const [news, setNews] = useState([])
 
   const [settings, setSettings] = useState({
-    siteName: 'COREGG TESTE',
+    siteName: 'COREGG TESTE DA MADRUGADA',
     siteSubtitle: 'ORGANIZAÇÃO DE E-SPORTS',
     homeButtonText: 'Conheça a COREGG',
     homeBannerImage: ''
