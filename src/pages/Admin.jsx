@@ -93,7 +93,6 @@ function Admin({ adminSection }) {
 
     formData.append('image', file)
 
-    const response = await fetch(
     const response = await fetch(`${API_URL}/api/upload/home-image`, {
       method: 'POST',
       headers: {
