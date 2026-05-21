@@ -70,12 +70,12 @@ function Partners() {
               <h2>MAIS VIDA</h2>
 
               <h3>
-                Transformando vidas através do esporte
+                Transformando vidas através de Cultura e Esporte
               </h3>
 
               <p>
-                O Projeto MAIS VIDA oferece aulas de
-                Jiu-Jitsu para crianças, adolescentes,
+                O Projeto MAIS VIDA oferece aulas de Inglês,
+                Jiu-Jitsu e Violão para crianças, adolescentes,
                 jovens e adultos da comunidade.
                 Tudo isso de forma 100% gratuita,
                 promovendo inclusão, disciplina e
