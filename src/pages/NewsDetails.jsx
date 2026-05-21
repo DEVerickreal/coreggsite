@@ -84,11 +84,10 @@ function NewsDetails() {
             {article.description}
           </p>
 
-          {article.content.split('\n').map((paragraph, index) => (
-            <p key={index}>
-              {paragraph}
-            </p>
-          ))}
+      <div className="noticia-texto">
+  {article.content}
+</div>
+  
         </article>
 
         {relatedNews.length > 0 && (
