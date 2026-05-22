@@ -2,15 +2,41 @@ import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import path from 'path'
-import Database from 'better-sqlite3'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import mongoose from 'mongoose'
 import { v2 as cloudinary } from 'cloudinary'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import { fileURLToPath } from 'url'
 
 dotenv.config()
+
+const app = express()
+const PORT = process.env.PORT || 3001
+const JWT_SECRET = 'coregg_super_secret_admin'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+app.use(cors())
+app.use(express.json())
+
+// ======================
+// MONGODB
+// ======================
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('MongoDB conectado')
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+
+// ======================
+// CLOUDINARY
+// ======================
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -18,20 +44,74 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// ======================
+// SCHEMAS
+// ======================
 
-const app = express()
-const PORT = process.env.PORT || 3001
-const JWT_SECRET = 'coregg_super_secret_admin'
+const newsSchema = new mongoose.Schema({
+  title: String,
+  category: String,
+  description: String,
+  content: String,
+  image: String,
+  featured: {
+    type: Number,
+    default: 0
+  },
+  views: {
+    type: Number,
+    default: 0
+  },
+  position: {
+    type: Number,
+    default: 0
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
+  }
+})
 
-const DISCORD_CONTACT_WEBHOOK =
-  'https://discord.com/api/webhooks/1504216019961511978/ax0a-WICFMYyBXbp6rbLHbfWGuJcf3eYMb87JYgf8i8d5oPEKGHbjPljXX_YmWHY7nVK'
+const adminSchema = new mongoose.Schema({
+  email: String,
+  password: String
+})
 
-const db = new Database('database.db')
+const settingsSchema = new mongoose.Schema({
+  key: String,
+  value: String
+})
 
-app.use(cors())
-app.use(express.json())
+const News = mongoose.model('News', newsSchema)
+const Admin = mongoose.model('Admin', adminSchema)
+const Settings = mongoose.model('Settings', settingsSchema)
+
+// ======================
+// ADMIN DEFAULT
+// ======================
+
+async function createAdmin() {
+  const adminExists = await Admin.findOne({
+    email: 'admin@coregg.com'
+  })
+
+  if (!adminExists) {
+    const hashedPassword = bcrypt.hashSync('coregg123', 10)
+
+    await Admin.create({
+      email: 'admin@coregg.com',
+      password: hashedPassword
+    })
+
+    console.log('Admin criado')
+  }
+}
+
+createAdmin()
+
+// ======================
+// AUTH
+// ======================
 
 function authAdmin(req, res, next) {
   const authHeader = req.headers.authorization
@@ -54,51 +134,9 @@ function authAdmin(req, res, next) {
   }
 }
 
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS news (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    category TEXT NOT NULL,
-    description TEXT NOT NULL,
-    content TEXT NOT NULL,
-    image TEXT,
-    featured INTEGER DEFAULT 0,
-    views INTEGER DEFAULT 0,
-    position INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  )
-`).run()
-
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS settings (
-    key TEXT PRIMARY KEY,
-    value TEXT
-  )
-`).run()
-
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS admins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE,
-    password TEXT
-  )
-`).run()
-
-const adminExists = db
-  .prepare('SELECT * FROM admins WHERE email = ?')
-  .get('admin@coregg.com')
-
-if (!adminExists) {
-  const hashedPassword = bcrypt.hashSync('coregg123', 10)
-
-  db.prepare(`
-    INSERT INTO admins (
-      email,
-      password
-    )
-    VALUES (?, ?)
-  `).run('admin@coregg.com', hashedPassword)
-}
+// ======================
+// MULTER
+// ======================
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -116,27 +154,17 @@ const storage = new CloudinaryStorage({
 })
 
 const upload = multer({
-  storage,
-
-  limits: {
-    fileSize: 50 * 1024 * 1024
-  },
-
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true)
-    } else {
-      cb(new Error('Arquivo inválido'))
-    }
-  }
+  storage
 })
 
-app.post('/api/login', (req, res) => {
+// ======================
+// LOGIN
+// ======================
+
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body
 
-  const admin = db
-    .prepare('SELECT * FROM admins WHERE email = ?')
-    .get(email)
+  const admin = await Admin.findOne({ email })
 
   if (!admin) {
     return res.status(401).json({
@@ -154,7 +182,7 @@ app.post('/api/login', (req, res) => {
 
   const token = jwt.sign(
     {
-      id: admin.id,
+      id: admin._id,
       email: admin.email
     },
     JWT_SECRET,
@@ -168,163 +196,21 @@ app.post('/api/login', (req, res) => {
   })
 })
 
-app.post('/api/contact', async (req, res) => {
-  try {
-    const { name, email, subject, message } = req.body
+// ======================
+// NEWS
+// ======================
 
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({
-        error: 'Preencha todos os campos.'
-      })
-    }
-
-    const discordMessage = {
-      username: 'COREGG Site',
-
-      embeds: [
-        {
-          title: '📩 Novo contato recebido',
-
-          color: 55807,
-
-          fields: [
-            {
-              name: 'Nome',
-              value: name,
-              inline: true
-            },
-
-            {
-              name: 'E-mail',
-              value: email,
-              inline: true
-            },
-
-            {
-              name: 'Assunto',
-              value: subject,
-              inline: false
-            },
-
-            {
-              name: 'Mensagem',
-              value: message,
-              inline: false
-            }
-          ],
-
-          footer: {
-            text: 'Formulário oficial do site COREGG'
-          },
-
-          timestamp: new Date().toISOString()
-        }
-      ]
-    }
-
-    const response = await fetch(DISCORD_CONTACT_WEBHOOK, {
-      method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json'
-      },
-
-      body: JSON.stringify(discordMessage)
-    })
-
-    if (!response.ok) {
-      return res.status(500).json({
-        error: 'Erro ao enviar para o Discord.'
-      })
-    }
-
-    res.json({
-      success: true
-    })
-  } catch {
-    res.status(500).json({
-      error: 'Erro interno ao enviar contato.'
-    })
-  }
-})
-
-app.get('/api/settings', (req, res) => {
-  const rows = db.prepare('SELECT * FROM settings').all()
-
-  const settings = {}
-
-  rows.forEach((item) => {
-    settings[item.key] = item.value
+app.get('/api/news', async (req, res) => {
+  const news = await News.find().sort({
+    position: 1,
+    created_at: -1
   })
-
-  res.json(settings)
-})
-
-app.put('/api/settings', authAdmin, (req, res) => {
-  const settings = req.body
-
-  const update = db.prepare(`
-    INSERT INTO settings (
-      key,
-      value
-    )
-    VALUES (?, ?)
-
-    ON CONFLICT(key) DO UPDATE SET
-    value = excluded.value
-  `)
-
-  Object.entries(settings).forEach(([key, value]) => {
-    update.run(key, value ?? '')
-  })
-
-  res.json({
-    success: true
-  })
-})
-
-app.post(
-  '/api/upload/home-image',
-  authAdmin,
-  upload.single('image'),
-  (req, res) => {
-
-    console.log(req.file)
-
-    if (!req.file) {
-      return res.status(400).json({
-        error: 'Imagem não enviada'
-      })
-    }
-
-    res.json({
-      image: req.file.path
-    })
-  }
-)
-
-app.get('/api/news', (req, res) => {
-  const news = db
-    .prepare(`
-      SELECT *
-      FROM news
-      ORDER BY position ASC, id DESC
-    `)
-    .all()
 
   res.json(news)
 })
 
-app.get('/api/news/:id', (req, res) => {
-  const { id } = req.params
-
-  const news = db
-    .prepare(`
-      SELECT *
-      FROM news
-      WHERE id = ?
-    `)
-    .get(id)
+app.get('/api/news/:id', async (req, res) => {
+  const news = await News.findById(req.params.id)
 
   if (!news) {
     return res.status(404).json({
@@ -332,26 +218,17 @@ app.get('/api/news/:id', (req, res) => {
     })
   }
 
-  db.prepare(`
-    UPDATE news
-    SET views = views + 1
-    WHERE id = ?
-  `).run(id)
+  news.views += 1
+  await news.save()
 
-  res.json({
-    ...news,
-    views: news.views + 1
-  })
+  res.json(news)
 })
 
 app.post(
   '/api/news',
   authAdmin,
   upload.single('image'),
-  (req, res) => {
-
-    console.log('=== FILE ===')
-    console.log(req.file)
+  async (req, res) => {
 
     const {
       title,
@@ -360,167 +237,76 @@ app.post(
       content
     } = req.body
 
-    if (!title || !category || !description || !content) {
-      return res.status(400).json({
-        error: 'Preencha todos os campos da notícia.'
-      })
-    }
-
     const image = req.file
       ? req.file.path
       : null
 
-    const lastPosition = db
-      .prepare(`
-        SELECT MAX(position) as maxPosition
-        FROM news
-      `)
-      .get()
+    const lastNews = await News.findOne().sort({
+      position: -1
+    })
 
-    const position = lastPosition.maxPosition
-      ? lastPosition.maxPosition + 1
+    const position = lastNews
+      ? lastNews.position + 1
       : 1
 
-    const insert = db.prepare(`
-      INSERT INTO news (
-        title,
-        category,
-        description,
-        content,
-        image,
-        position
-      )
-      VALUES (?, ?, ?, ?, ?, ?)
-    `)
-
-    const result = insert.run(
+    const news = await News.create({
       title,
       category,
       description,
       content,
       image,
       position
-    )
+    })
 
     res.json({
       success: true,
-      id: result.lastInsertRowid,
-      image
+      news
     })
   }
 )
-
-app.put('/api/news/order', authAdmin, (req, res) => {
-  const { news } = req.body
-
-  if (!Array.isArray(news)) {
-    return res.status(400).json({
-      error: 'Lista inválida'
-    })
-  }
-
-  const update = db.prepare(`
-    UPDATE news
-    SET position = ?
-    WHERE id = ?
-  `)
-
-  news.forEach((item, index) => {
-    update.run(index + 1, item.id)
-  })
-
-  res.json({
-    success: true
-  })
-})
 
 app.put(
   '/api/news/:id',
   authAdmin,
   upload.single('image'),
-  (req, res) => {
+  async (req, res) => {
 
-    console.log('UPDATE FILE:', req.file)
+    const news = await News.findById(req.params.id)
 
-    const { id } = req.params
-
-    const {
-      title,
-      category,
-      description,
-      content
-    } = req.body
-
-    const currentNews = db
-      .prepare('SELECT * FROM news WHERE id = ?')
-      .get(id)
-
-    if (!currentNews) {
+    if (!news) {
       return res.status(404).json({
         error: 'Notícia não encontrada'
       })
     }
 
-    const image = req.file
-      ? req.file.path
-      : currentNews.image
+    news.title = req.body.title
+    news.category = req.body.category
+    news.description = req.body.description
+    news.content = req.body.content
 
-    db.prepare(`
-      UPDATE news
-      SET
-        title = ?,
-        category = ?,
-        description = ?,
-        content = ?,
-        image = ?
-      WHERE id = ?
-    `).run(
-      title,
-      category,
-      description,
-      content,
-      image,
-      id
-    )
+    if (req.file) {
+      news.image = req.file.path
+    }
+
+    await news.save()
 
     res.json({
-      success: true,
-      image
+      success: true
     })
   }
 )
 
-app.delete('/api/news/:id', authAdmin, (req, res) => {
-  const { id } = req.params
-
-  db.prepare(`
-    DELETE FROM news
-    WHERE id = ?
-  `).run(id)
+app.delete('/api/news/:id', authAdmin, async (req, res) => {
+  await News.findByIdAndDelete(req.params.id)
 
   res.json({
     success: true
   })
 })
 
-app.use((err, req, res, next) => {
-
-  console.log(err)
-
-  if (err instanceof multer.MulterError) {
-    return res.status(400).json({
-      error: err.message
-    })
-  }
-
-  if (err) {
-    return res.status(400).json({
-      error: err.message || 'Erro interno'
-    })
-  }
-
-  next()
-})
+// ======================
+// FRONTEND
+// ======================
 
 app.use(express.static(path.join(__dirname, '../dist')))
 
@@ -528,6 +314,10 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'))
 })
 
+// ======================
+// START
+// ======================
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`COREGG API rodando na porta ${PORT}`)
+  console.log(`Servidor rodando na porta ${PORT}`)
 })
