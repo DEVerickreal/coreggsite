@@ -1,10 +1,19 @@
 import { Link } from 'react-router-dom'
 
-function NewsCard({ id, title, category, description, image, date }) {
+function NewsCard({
+  id,
+  title,
+  category,
+  description,
+  image,
+  date
+}) {
   function formatDate(value) {
     if (!value) return ''
 
-    return new Date(value).toLocaleDateString('pt-BR')
+    return new Date(value).toLocaleDateString(
+      'pt-BR'
+    )
   }
 
   function limitText(text, limit = 170) {
@@ -18,8 +27,14 @@ function NewsCard({ id, title, category, description, image, date }) {
   }
 
   return (
-    <Link to={`/news/${id}`} className="newsCard">
-      <img src={image} alt={title} />
+    <Link
+      to={`/news/${id}`}
+      className="newsCard"
+    >
+      <img
+        src={image || '/favicon.png'}
+        alt={title}
+      />
 
       <div className="newsContent">
         <span>{category}</span>

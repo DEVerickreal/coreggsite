@@ -16,7 +16,9 @@ function NewsDetails() {
   function formatDate(value) {
     if (!value) return ''
 
-    return new Date(value).toLocaleDateString('pt-BR')
+    return new Date(value).toLocaleDateString(
+      'pt-BR'
+    )
   }
 
   async function loadNews() {
@@ -51,7 +53,6 @@ function NewsDetails() {
       if (Array.isArray(allNews)) {
         setNews(allNews)
       }
-
     } catch (error) {
       console.error(error)
       setArticle(null)
@@ -92,7 +93,9 @@ function NewsDetails() {
   }
 
   const relatedNews = news
-    .filter((item) => item._id !== article._id)
+    .filter(
+      (item) => item._id !== article._id
+    )
     .slice(0, 4)
 
   return (

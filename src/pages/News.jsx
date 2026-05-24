@@ -12,9 +12,12 @@ function News() {
 
   async function loadNews() {
     try {
-      const response = await fetch(`${API_URL}/api/news`, {
-        cache: 'no-store'
-      })
+      const response = await fetch(
+        `${API_URL}/api/news?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
+      )
 
       const data = await response.json()
 
@@ -22,7 +25,10 @@ function News() {
         setNews(data)
       }
     } catch (error) {
-      console.error('Erro ao carregar notícias:', error)
+      console.error(
+        'Erro ao carregar notícias:',
+        error
+      )
     } finally {
       setLoading(false)
     }
@@ -40,7 +46,8 @@ function News() {
             <h1>Notícias</h1>
 
             <p>
-              Acompanhe os principais anúncios, novidades e atualizações da COREGG.
+              Acompanhe os principais anúncios,
+              novidades e atualizações da COREGG.
             </p>
           </div>
         </Reveal>
@@ -52,7 +59,10 @@ function News() {
         ) : (
           <div className="newsPageGrid">
             {news.map((item, index) => (
-              <Reveal key={item._id} delay={index * 0.12}>
+              <Reveal
+                key={item._id}
+                delay={index * 0.12}
+              >
                 <NewsCard
                   id={item._id}
                   title={item.title}

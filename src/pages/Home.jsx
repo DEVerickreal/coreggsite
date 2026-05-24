@@ -21,14 +21,25 @@ function Home() {
 
   async function loadSettings() {
     try {
-      const response = await fetch(`${API_URL}/api/settings`)
+      const response = await fetch(
+        `${API_URL}/api/settings?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
+      )
+
       const data = await response.json()
 
       setSettings({
         siteName: data.siteName || 'COREGG',
-        siteSubtitle: data.siteSubtitle || 'ORGANIZAÇÃO DE E-SPORTS',
-        homeButtonText: data.homeButtonText || 'Conheça a COREGG',
-        homeBannerImage: data.homeBannerImage || ''
+        siteSubtitle:
+          data.siteSubtitle ||
+          'ORGANIZAÇÃO DE E-SPORTS',
+        homeButtonText:
+          data.homeButtonText ||
+          'Conheça a COREGG',
+        homeBannerImage:
+          data.homeBannerImage || ''
       })
     } catch (error) {
       console.log(error)
@@ -37,10 +48,18 @@ function Home() {
 
   async function loadNews() {
     try {
-      const response = await fetch(`${API_URL}/api/news`)
+      const response = await fetch(
+        `${API_URL}/api/news?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
+      )
+
       const data = await response.json()
 
-      setNews(data.slice(0, 9))
+      if (Array.isArray(data)) {
+        setNews(data.slice(0, 9))
+      }
     } catch (error) {
       console.log(error)
     }
@@ -56,14 +75,14 @@ function Home() {
       <div>
         <section className="hero">
           <img
-src={
-  settings.homeBannerImage
-    ? settings.homeBannerImage
-    : heroImage
-  }
-  alt="COREGG"
-  className="heroImage"
-/>
+            src={
+              settings.homeBannerImage
+                ? settings.homeBannerImage
+                : heroImage
+            }
+            alt="COREGG"
+            className="heroImage"
+          />
 
           <div className="overlay"></div>
 
@@ -79,13 +98,18 @@ src={
             </Reveal>
 
             <Reveal delay={0.3}>
-              <a href="/creators" className="heroButton">
-              <img
-  src="/favicon.png"
-  alt="COREGG"
-  className="heroButtonLogo"
-/>
-                {settings.homeButtonText || 'Conheça a COREGG'}
+              <a
+                href="/creators"
+                className="heroButton"
+              >
+                <img
+                  src="/favicon.png"
+                  alt="COREGG"
+                  className="heroButtonLogo"
+                />
+
+                {settings.homeButtonText ||
+                  'Conheça a COREGG'}
               </a>
             </Reveal>
           </div>
@@ -100,29 +124,35 @@ src={
                 <h2>Últimas notícias</h2>
 
                 <p>
-                  Fique por dentro dos principais anúncios,
-                  projetos e atualizações da COREGG.
+                  Fique por dentro dos principais
+                  anúncios, projetos e atualizações
+                  da COREGG.
                 </p>
               </div>
 
-              <Link to="/news">Ver todas</Link>
+              <Link to="/news">
+                Ver todas
+              </Link>
             </div>
           </Reveal>
 
           <div className="homeNewsGrid">
             {news.map((item, index) => (
-              <Reveal key={item.id} delay={index * 0.08}>
+              <Reveal
+                key={item._id}
+                delay={index * 0.08}
+              >
                 <NewsCard
-                  id={item.id}
+                  id={item._id}
                   title={item.title}
                   category={item.category}
                   description={item.description}
                   date={item.created_at}
-                 image={
-  item.image
-    ? item.image
-    : '/favicon.png'
-}
+                  image={
+                    item.image
+                      ? item.image
+                      : '/favicon.png'
+                  }
                 />
               </Reveal>
             ))}
