@@ -451,6 +451,93 @@ app.put('/api/news/order', authAdmin, async (req, res) => {
 })
 
 // ======================
+// CONTACT / DISCORD WEBHOOK
+// ======================
+
+app.post('/api/contact', async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      subject,
+      message
+    } = req.body
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({
+        error: 'Preencha todos os campos'
+      })
+    }
+
+    const webhookURL =
+      'https://discord.com/api/webhooks/1504216019961511978/ax0a-WICFMYyBXbp6rbLHbfWGuJcf3eYMb87JYgf8i8d5oPEKGHbjPljXX_YmWHY7nVK'
+
+    const discordMessage = {
+      embeds: [
+        {
+          title: '📩 Novo contato recebido',
+          color: 65535,
+
+          fields: [
+            {
+              name: '👤 Nome',
+              value: name,
+              inline: false
+            },
+            {
+              name: '📧 Email',
+              value: email,
+              inline: false
+            },
+            {
+              name: '📌 Assunto',
+              value: subject,
+              inline: false
+            },
+            {
+              name: '📝 Mensagem',
+              value: message,
+              inline: false
+            }
+          ],
+
+          footer: {
+            text: 'COREGG Website'
+          },
+
+          timestamp: new Date()
+        }
+      ]
+    }
+
+    const response = await fetch(webhookURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(discordMessage)
+    })
+
+    if (!response.ok) {
+      return res.status(500).json({
+        error: 'Erro ao enviar webhook'
+      })
+    }
+
+    res.json({
+      success: true
+    })
+
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao enviar contato'
+    })
+  }
+})
+
+// ======================
 // FRONTEND
 // ======================
 
