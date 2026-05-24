@@ -30,10 +30,10 @@ function SiteLayout({ children }) {
 function App() {
   return (
     <BrowserRouter>
-  <ScrollToTop />
-  <CursorGlow />
+      <ScrollToTop />
+      <CursorGlow />
 
-  <Routes>
+      <Routes>
         <Route
           path="/"
           element={
@@ -115,7 +115,7 @@ function App() {
           path="/admin"
           element={
             <AdminLayout>
-              <Admin />
+              <Admin adminSection="dashboard" />
             </AdminLayout>
           }
         />
@@ -124,7 +124,7 @@ function App() {
           path="/admin/dashboard"
           element={
             <AdminLayout>
-              <Admin />
+              <Admin adminSection="dashboard" />
             </AdminLayout>
           }
         />
@@ -133,7 +133,7 @@ function App() {
           path="/admin/news"
           element={
             <AdminLayout>
-              <Admin />
+              <Admin adminSection="news" />
             </AdminLayout>
           }
         />
@@ -142,7 +142,7 @@ function App() {
           path="/admin/settings"
           element={
             <AdminLayout>
-              <Admin />
+              <Admin adminSection="settings" />
             </AdminLayout>
           }
         />
@@ -151,7 +151,7 @@ function App() {
           path="/admin/preview"
           element={
             <AdminLayout>
-              <Admin />
+              <Admin adminSection="preview" />
             </AdminLayout>
           }
         />

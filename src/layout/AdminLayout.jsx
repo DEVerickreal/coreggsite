@@ -1,9 +1,12 @@
-import { useState, cloneElement, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import {
+  useNavigate,
+  useLocation
+} from 'react-router-dom'
 
 function AdminLayout({ children }) {
-  const [adminSection, setAdminSection] = useState('dashboard')
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     document.title = 'PainelAdm COREGG'
@@ -14,11 +17,22 @@ function AdminLayout({ children }) {
     navigate('/login')
   }
 
+  const adminSection =
+    location.pathname === '/admin/news'
+      ? 'news'
+      : location.pathname === '/admin/settings'
+      ? 'settings'
+      : location.pathname === '/admin/preview'
+      ? 'preview'
+      : 'dashboard'
+
   return (
     <div className="adminLayout">
       <aside className="adminSidebar">
         <div className="adminBrand">
-          <div className="adminLogoMark">CC</div>
+          <div className="adminLogoMark">
+            CC
+          </div>
 
           <div>
             <h2>COREGG</h2>
@@ -27,7 +41,9 @@ function AdminLayout({ children }) {
         </div>
 
         <div className="adminUserBox">
-          <div className="adminUserAvatar">EA</div>
+          <div className="adminUserAvatar">
+            EA
+          </div>
 
           <div>
             <strong>Erick Almeida</strong>
@@ -37,32 +53,56 @@ function AdminLayout({ children }) {
 
         <nav className="adminNav">
           <button
-            className={adminSection === 'dashboard' ? 'activeAdmin' : ''}
-            onClick={() => setAdminSection('dashboard')}
+            className={
+              adminSection === 'dashboard'
+                ? 'activeAdmin'
+                : ''
+            }
+            onClick={() =>
+              navigate('/admin/dashboard')
+            }
           >
             <span>01</span>
             Dashboard
           </button>
 
           <button
-            className={adminSection === 'news' ? 'activeAdmin' : ''}
-            onClick={() => setAdminSection('news')}
+            className={
+              adminSection === 'news'
+                ? 'activeAdmin'
+                : ''
+            }
+            onClick={() =>
+              navigate('/admin/news')
+            }
           >
             <span>02</span>
             Notícias
           </button>
 
           <button
-            className={adminSection === 'settings' ? 'activeAdmin' : ''}
-            onClick={() => setAdminSection('settings')}
+            className={
+              adminSection === 'settings'
+                ? 'activeAdmin'
+                : ''
+            }
+            onClick={() =>
+              navigate('/admin/settings')
+            }
           >
             <span>03</span>
             Home / Destaques
           </button>
 
           <button
-            className={adminSection === 'preview' ? 'activeAdmin' : ''}
-            onClick={() => setAdminSection('preview')}
+            className={
+              adminSection === 'preview'
+                ? 'activeAdmin'
+                : ''
+            }
+            onClick={() =>
+              navigate('/admin/preview')
+            }
           >
             <span>04</span>
             Prévia do site
@@ -91,7 +131,10 @@ function AdminLayout({ children }) {
       <main className="adminContent">
         <div className="adminTopbar">
           <div>
-            <span>PAINEL ADMINISTRATIVO</span>
+            <span>
+              PAINEL ADMINISTRATIVO
+            </span>
+
             <h1>Central COREGG</h1>
           </div>
 
@@ -101,7 +144,7 @@ function AdminLayout({ children }) {
           </div>
         </div>
 
-        {cloneElement(children, { adminSection })}
+        {children}
       </main>
     </div>
   )

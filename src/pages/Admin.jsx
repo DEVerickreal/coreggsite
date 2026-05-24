@@ -2,6 +2,8 @@ import '../styles/admin.css'
 
 import { useEffect, useState } from 'react'
 
+import Home from './Home'
+
 import API_URL from '../api'
 
 function Admin({ adminSection }) {
@@ -30,32 +32,56 @@ function Admin({ adminSection }) {
   const [description, setDescription] = useState('')
   const [content, setContent] = useState('')
   const [image, setImage] = useState(null)
-  const [homeBannerFile, setHomeBannerFile] = useState(null)
+
+  const [homeBannerFile, setHomeBannerFile] =
+    useState(null)
 
   async function loadSettings() {
     try {
-      const response = await fetch(`${API_URL}/api/settings`, {
-        cache: 'no-store'
-      })
+      const response = await fetch(
+        `${API_URL}/api/settings?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
+      )
 
       const data = await response.json()
 
       setSettings({
         siteName: data.siteName || 'COREGG',
+
         siteSubtitle:
-          data.siteSubtitle || 'ORGANIZAÇÃO DE E-SPORTS',
-        siteDescription: data.siteDescription || '',
+          data.siteSubtitle ||
+          'ORGANIZAÇÃO DE E-SPORTS',
+
+        siteDescription:
+          data.siteDescription || '',
+
         homeButtonText:
-          data.homeButtonText || 'Conheça a COREGG',
+          data.homeButtonText ||
+          'Conheça a COREGG',
+
         homeButtonLink:
-          data.homeButtonLink || '/creators',
+          data.homeButtonLink ||
+          '/creators',
+
         homeBannerImage:
           data.homeBannerImage || '',
-        discordLink: data.discordLink || '',
-        instagramLink: data.instagramLink || '',
-        tiktokLink: data.tiktokLink || '',
-        youtubeLink: data.youtubeLink || '',
-        contactEmail: data.contactEmail || ''
+
+        discordLink:
+          data.discordLink || '',
+
+        instagramLink:
+          data.instagramLink || '',
+
+        tiktokLink:
+          data.tiktokLink || '',
+
+        youtubeLink:
+          data.youtubeLink || '',
+
+        contactEmail:
+          data.contactEmail || ''
       })
     } catch (error) {
       console.error(error)
@@ -64,9 +90,12 @@ function Admin({ adminSection }) {
 
   async function loadNews() {
     try {
-      const response = await fetch(`${API_URL}/api/news`, {
-        cache: 'no-store'
-      })
+      const response = await fetch(
+        `${API_URL}/api/news?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
+      )
 
       const data = await response.json()
 
@@ -140,7 +169,9 @@ function Admin({ adminSection }) {
     e.preventDefault()
 
     try {
-      let updatedSettings = { ...settings }
+      let updatedSettings = {
+        ...settings
+      }
 
       if (homeBannerFile) {
         const uploadedImage =
@@ -148,7 +179,8 @@ function Admin({ adminSection }) {
 
         updatedSettings = {
           ...updatedSettings,
-          homeBannerImage: uploadedImage
+          homeBannerImage:
+            uploadedImage
         }
       }
 
@@ -157,17 +189,26 @@ function Admin({ adminSection }) {
         {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type':
+              'application/json',
+
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(updatedSettings)
+
+          body: JSON.stringify(
+            updatedSettings
+          )
         }
       )
 
       const data = await response.json()
 
       if (!response.ok) {
-        alert(data.error || 'Erro ao salvar banner')
+        alert(
+          data.error ||
+            'Erro ao salvar banner'
+        )
+
         return
       }
 
@@ -193,17 +234,26 @@ function Admin({ adminSection }) {
         {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type':
+              'application/json',
+
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(updatedSettings)
+
+          body: JSON.stringify(
+            updatedSettings
+          )
         }
       )
 
       const data = await response.json()
 
       if (!response.ok) {
-        alert(data.error || 'Erro ao resetar banner')
+        alert(
+          data.error ||
+            'Erro ao resetar banner'
+        )
+
         return
       }
 
@@ -223,7 +273,11 @@ function Admin({ adminSection }) {
 
       formData.append('title', title)
       formData.append('category', category)
-      formData.append('description', description)
+      formData.append(
+        'description',
+        description
+      )
+
       formData.append('content', content)
 
       if (image) {
@@ -259,7 +313,11 @@ function Admin({ adminSection }) {
       const data = await response.json()
 
       if (!response.ok) {
-        alert(data.error || 'Erro ao salvar notícia')
+        alert(
+          data.error ||
+            'Erro ao salvar notícia'
+        )
+
         return
       }
 
@@ -300,7 +358,11 @@ function Admin({ adminSection }) {
       const data = await response.json()
 
       if (!response.ok) {
-        alert(data.error || 'Erro ao excluir notícia')
+        alert(
+          data.error ||
+            'Erro ao excluir notícia'
+        )
+
         return
       }
 
@@ -314,30 +376,49 @@ function Admin({ adminSection }) {
     }
   }
 
-  async function saveNewsOrder(updatedNews) {
+  async function saveNewsOrder(
+    updatedNews
+  ) {
     try {
-      await fetch(`${API_URL}/api/news/order`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          news: updatedNews.map((item) => ({
-            id: item._id
-          }))
-        })
-      })
+      await fetch(
+        `${API_URL}/api/news/order`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type':
+              'application/json',
+
+            Authorization: `Bearer ${token}`
+          },
+
+          body: JSON.stringify({
+            news: updatedNews.map(
+              (item) => ({
+                id: item._id
+              })
+            )
+          })
+        }
+      )
     } catch (error) {
       console.error(error)
     }
   }
 
-  async function moveNews(index, direction) {
+  async function moveNews(
+    index,
+    direction
+  ) {
     const updatedNews = [...news]
 
-    if (direction === 'up' && index > 0) {
-      ;[updatedNews[index], updatedNews[index - 1]] = [
+    if (
+      direction === 'up' &&
+      index > 0
+    ) {
+      ;[
+        updatedNews[index],
+        updatedNews[index - 1]
+      ] = [
         updatedNews[index - 1],
         updatedNews[index]
       ]
@@ -347,7 +428,10 @@ function Admin({ adminSection }) {
       direction === 'down' &&
       index < updatedNews.length - 1
     ) {
-      ;[updatedNews[index], updatedNews[index + 1]] = [
+      ;[
+        updatedNews[index],
+        updatedNews[index + 1]
+      ] = [
         updatedNews[index + 1],
         updatedNews[index]
       ]
@@ -360,6 +444,165 @@ function Admin({ adminSection }) {
 
   return (
     <div className="adminPage">
+      {adminSection ===
+        'dashboard' && (
+        <div className="adminBox">
+          <div className="adminBoxHeader">
+            <h3>Dashboard</h3>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fit,minmax(220px,1fr))',
+              gap: '20px'
+            }}
+          >
+            <div className="adminStatsCard">
+              <h2>{news.length}</h2>
+              <p>Total de notícias</p>
+            </div>
+
+            <div className="adminStatsCard">
+              <h2>
+                {
+                  news.filter(
+                    (item) =>
+                      item.featured === 1
+                  ).length
+                }
+              </h2>
+
+              <p>Notícias destaque</p>
+            </div>
+
+            <div className="adminStatsCard">
+              <h2>
+                {news.reduce(
+                  (acc, item) =>
+                    acc +
+                    (item.views || 0),
+                  0
+                )}
+              </h2>
+
+              <p>Total de visualizações</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {adminSection === 'settings' && (
+        <div className="adminBox">
+          <div className="adminBoxHeader">
+            <h3>
+              Home / Destaques
+            </h3>
+          </div>
+
+          <form
+            className="adminForm"
+            onSubmit={saveHomeBanner}
+          >
+            <input
+              type="text"
+              placeholder="Nome do site"
+              value={settings.siteName}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  siteName:
+                    e.target.value
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Subtítulo"
+              value={
+                settings.siteSubtitle
+              }
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  siteSubtitle:
+                    e.target.value
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Texto do botão"
+              value={
+                settings.homeButtonText
+              }
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  homeButtonText:
+                    e.target.value
+                })
+              }
+            />
+
+            <label className="customUpload">
+              <span>
+                {homeBannerFile
+                  ? homeBannerFile.name
+                  : 'Selecionar banner'}
+              </span>
+
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) =>
+                  setHomeBannerFile(
+                    e.target.files[0]
+                  )
+                }
+              />
+            </label>
+
+            <button type="submit">
+              Salvar alterações
+            </button>
+
+            <button
+              type="button"
+              className="cancelEditButton"
+              onClick={
+                resetHomeBanner
+              }
+            >
+              Restaurar banner
+            </button>
+          </form>
+        </div>
+      )}
+
+      {adminSection === 'preview' && (
+        <div className="adminBox">
+          <div className="adminBoxHeader">
+            <h3>Prévia do site</h3>
+          </div>
+
+          <div
+            style={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              border:
+                '1px solid rgba(255,255,255,.08)'
+            }}
+          >
+            <Home />
+          </div>
+        </div>
+      )}
+
       {adminSection === 'news' && (
         <div className="adminGrid">
           <div className="adminLeft">
@@ -381,7 +624,9 @@ function Admin({ adminSection }) {
                   placeholder="Título"
                   value={title}
                   onChange={(e) =>
-                    setTitle(e.target.value)
+                    setTitle(
+                      e.target.value
+                    )
                   }
                   required
                 />
@@ -391,7 +636,9 @@ function Admin({ adminSection }) {
                   placeholder="Categoria"
                   value={category}
                   onChange={(e) =>
-                    setCategory(e.target.value)
+                    setCategory(
+                      e.target.value
+                    )
                   }
                   required
                 />
@@ -400,7 +647,9 @@ function Admin({ adminSection }) {
                   placeholder="Descrição"
                   value={description}
                   onChange={(e) =>
-                    setDescription(e.target.value)
+                    setDescription(
+                      e.target.value
+                    )
                   }
                   required
                 />
@@ -409,7 +658,9 @@ function Admin({ adminSection }) {
                   placeholder="Conteúdo"
                   value={content}
                   onChange={(e) =>
-                    setContent(e.target.value)
+                    setContent(
+                      e.target.value
+                    )
                   }
                   required
                 />
@@ -426,7 +677,9 @@ function Admin({ adminSection }) {
                     accept="image/*"
                     hidden
                     onChange={(e) =>
-                      setImage(e.target.files[0])
+                      setImage(
+                        e.target.files[0]
+                      )
                     }
                   />
                 </label>
@@ -441,7 +694,9 @@ function Admin({ adminSection }) {
                   <button
                     type="button"
                     className="cancelEditButton"
-                    onClick={clearForm}
+                    onClick={
+                      clearForm
+                    }
                   >
                     Cancelar edição
                   </button>
@@ -453,69 +708,97 @@ function Admin({ adminSection }) {
           <div className="adminRight">
             <div className="adminBox">
               <div className="adminNewsList">
-                {news.map((item, index) => (
-                  <div
-                    key={item._id}
-                    className="adminNewsItem"
-                  >
-                    <img
-                      src={
-                        item.image
-                          ? item.image
-                          : '/favicon.png'
-                      }
-                      alt={item.title}
-                    />
+                {news.map(
+                  (item, index) => (
+                    <div
+                      key={item._id}
+                      className="adminNewsItem"
+                    >
+                      <img
+                        src={
+                          item.image
+                            ? item.image
+                            : '/favicon.png'
+                        }
+                        alt={
+                          item.title
+                        }
+                      />
 
-                    <div className="adminNewsInfo">
-                      <span>{item.category}</span>
+                      <div className="adminNewsInfo">
+                        <span>
+                          {
+                            item.category
+                          }
+                        </span>
 
-                      <h4>{item.title}</h4>
+                        <h4>
+                          {
+                            item.title
+                          }
+                        </h4>
 
-                      <p>{item.description}</p>
+                        <p>
+                          {
+                            item.description
+                          }
+                        </p>
+                      </div>
+
+                      <div className="adminNewsActions">
+                        <button
+                          className="moveButton"
+                          type="button"
+                          onClick={() =>
+                            moveNews(
+                              index,
+                              'up'
+                            )
+                          }
+                        >
+                          ↑
+                        </button>
+
+                        <button
+                          className="moveButton"
+                          type="button"
+                          onClick={() =>
+                            moveNews(
+                              index,
+                              'down'
+                            )
+                          }
+                        >
+                          ↓
+                        </button>
+
+                        <button
+                          className="editButton"
+                          type="button"
+                          onClick={() =>
+                            startEdit(
+                              item
+                            )
+                          }
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          className="deleteButton"
+                          type="button"
+                          onClick={() =>
+                            deleteNews(
+                              item._id
+                            )
+                          }
+                        >
+                          Excluir
+                        </button>
+                      </div>
                     </div>
-
-                    <div className="adminNewsActions">
-                      <button
-                        className="moveButton"
-                        type="button"
-                        onClick={() =>
-                          moveNews(index, 'up')
-                        }
-                      >
-                        ↑
-                      </button>
-
-                      <button
-                        className="moveButton"
-                        type="button"
-                        onClick={() =>
-                          moveNews(index, 'down')
-                        }
-                      >
-                        ↓
-                      </button>
-
-                      <button
-                        className="editButton"
-                        type="button"
-                        onClick={() => startEdit(item)}
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        className="deleteButton"
-                        type="button"
-                        onClick={() =>
-                          deleteNews(item._id)
-                        }
-                      >
-                        Excluir
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
 
                 {news.length === 0 && (
                   <div className="adminEmpty">
