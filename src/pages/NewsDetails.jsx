@@ -19,16 +19,25 @@ function NewsDetails() {
   }
 
   async function loadNews() {
-    const response = await fetch(`${API_URL}/api/news`)
-    const data = await response.json()
+    try {
+      const response = await fetch(`${API_URL}/api/news`, {
+        cache: 'no-store'
+      })
 
-    setNews(data)
+      const data = await response.json()
 
-    const selectedArticle = data.find(
-      (item) => String(item.id) === String(id)
-    )
+      if (!Array.isArray(data)) return
 
-    setArticle(selectedArticle)
+      setNews(data)
+
+      const selectedArticle = data.find(
+        (item) => String(item._id) === String(id)
+      )
+
+      setArticle(selectedArticle || null)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   useEffect(() => {
@@ -41,7 +50,10 @@ function NewsDetails() {
         <div className="newsDetailsPage">
           <h1>Notícia não encontrada</h1>
 
-          <Link to="/news" className="heroButton">
+          <Link
+            to="/news"
+            className="heroButton"
+          >
             Voltar para notícias
           </Link>
         </div>
@@ -50,7 +62,7 @@ function NewsDetails() {
   }
 
   const relatedNews = news
-    .filter((item) => item.id !== article.id)
+    .filter((item) => item._id !== article._id)
     .slice(0, 4)
 
   return (
@@ -58,11 +70,11 @@ function NewsDetails() {
       <div className="newsDetailsPage">
         <section className="newsDetailsHero">
           <img
-           src={
-  article.image
-    ? article.image
-    : '/favicon.png'
-}
+            src={
+              article.image
+                ? article.image
+                : '/favicon.png'
+            }
             alt={article.title}
           />
 
@@ -84,10 +96,9 @@ function NewsDetails() {
             {article.description}
           </p>
 
-      <div className="noticia-texto">
-  {article.content}
-</div>
-  
+          <div className="noticia-texto">
+            {article.content}
+          </div>
         </article>
 
         {relatedNews.length > 0 && (
@@ -97,17 +108,17 @@ function NewsDetails() {
             <div className="relatedNewsGrid">
               {relatedNews.map((item) => (
                 <NewsCard
-                  key={item.id}
-                  id={item.id}
+                  key={item._id}
+                  id={item._id}
                   title={item.title}
                   category={item.category}
                   description={item.description}
                   date={item.created_at}
-                 image={
-  item.image
-    ? item.image
-    : '/favicon.png'
-}
+                  image={
+                    item.image
+                      ? item.image
+                      : '/favicon.png'
+                  }
                 />
               ))}
             </div>
