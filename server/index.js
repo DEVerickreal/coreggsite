@@ -54,18 +54,22 @@ const newsSchema = new mongoose.Schema({
   description: String,
   content: String,
   image: String,
+
   featured: {
     type: Number,
     default: 0
   },
+
   views: {
     type: Number,
     default: 0
   },
+
   position: {
     type: Number,
     default: 0
   },
+
   created_at: {
     type: Date,
     default: Date.now
@@ -197,31 +201,108 @@ app.post('/api/login', async (req, res) => {
 })
 
 // ======================
+// SETTINGS
+// ======================
+
+app.get('/api/settings', async (req, res) => {
+  const settings = await Settings.find()
+
+  const formatted = {}
+
+  settings.forEach((item) => {
+    formatted[item.key] = item.value
+  })
+
+  res.json(formatted)
+})
+
+app.put('/api/settings', authAdmin, async (req, res) => {
+  const settings = req.body
+
+  for (const key in settings) {
+    await Settings.findOneAndUpdate(
+      { key },
+      {
+        key,
+        value: settings[key]
+      },
+      {
+        upsert: true
+      }
+    )
+  }
+
+  res.json({
+    success: true
+  })
+})
+
+// ======================
+// UPLOAD HOME IMAGE
+// ======================
+
+app.post(
+  '/api/upload/home-image',
+  authAdmin,
+  upload.single('image'),
+  async (req, res) => {
+
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'Imagem não enviada'
+      })
+    }
+
+    res.json({
+      image: req.file.path
+    })
+  }
+)
+
+// ======================
 // NEWS
 // ======================
 
 app.get('/api/news', async (req, res) => {
-  const news = await News.find().sort({
-    position: 1,
-    created_at: -1
-  })
+  try {
+    const news = await News.find()
+      .sort({
+        position: 1,
+        created_at: -1
+      })
 
-  res.json(news)
+    res.json(news)
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao buscar notícias'
+    })
+  }
 })
 
 app.get('/api/news/:id', async (req, res) => {
-  const news = await News.findById(req.params.id)
+  try {
+    const news = await News.findById(req.params.id)
 
-  if (!news) {
-    return res.status(404).json({
-      error: 'Notícia não encontrada'
+    if (!news) {
+      return res.status(404).json({
+        error: 'Notícia não encontrada'
+      })
+    }
+
+    news.views += 1
+
+    await news.save()
+
+    res.json(news)
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao buscar notícia'
     })
   }
-
-  news.views += 1
-  await news.save()
-
-  res.json(news)
 })
 
 app.post(
@@ -230,38 +311,52 @@ app.post(
   upload.single('image'),
   async (req, res) => {
 
-    const {
-      title,
-      category,
-      description,
-      content
-    } = req.body
+    try {
+      const {
+        title,
+        category,
+        description,
+        content
+      } = req.body
 
-    const image = req.file
-      ? req.file.path
-      : null
+      if (!title || !category || !description || !content) {
+        return res.status(400).json({
+          error: 'Preencha todos os campos.'
+        })
+      }
 
-    const lastNews = await News.findOne().sort({
-      position: -1
-    })
+      const image = req.file
+        ? req.file.path
+        : null
 
-    const position = lastNews
-      ? lastNews.position + 1
-      : 1
+      const lastNews = await News.findOne().sort({
+        position: -1
+      })
 
-    const news = await News.create({
-      title,
-      category,
-      description,
-      content,
-      image,
-      position
-    })
+      const position = lastNews
+        ? lastNews.position + 1
+        : 1
 
-    res.json({
-      success: true,
-      news
-    })
+      const news = await News.create({
+        title,
+        category,
+        description,
+        content,
+        image,
+        position
+      })
+
+      res.json({
+        success: true,
+        news
+      })
+    } catch (error) {
+      console.log(error)
+
+      res.status(500).json({
+        error: 'Erro ao publicar notícia'
+      })
+    }
   }
 )
 
@@ -271,37 +366,88 @@ app.put(
   upload.single('image'),
   async (req, res) => {
 
-    const news = await News.findById(req.params.id)
+    try {
+      const news = await News.findById(req.params.id)
 
-    if (!news) {
-      return res.status(404).json({
-        error: 'Notícia não encontrada'
+      if (!news) {
+        return res.status(404).json({
+          error: 'Notícia não encontrada'
+        })
+      }
+
+      news.title = req.body.title
+      news.category = req.body.category
+      news.description = req.body.description
+      news.content = req.body.content
+
+      if (req.file) {
+        news.image = req.file.path
+      }
+
+      await news.save()
+
+      res.json({
+        success: true
+      })
+    } catch (error) {
+      console.log(error)
+
+      res.status(500).json({
+        error: 'Erro ao editar notícia'
       })
     }
-
-    news.title = req.body.title
-    news.category = req.body.category
-    news.description = req.body.description
-    news.content = req.body.content
-
-    if (req.file) {
-      news.image = req.file.path
-    }
-
-    await news.save()
-
-    res.json({
-      success: true
-    })
   }
 )
 
 app.delete('/api/news/:id', authAdmin, async (req, res) => {
-  await News.findByIdAndDelete(req.params.id)
+  try {
+    await News.findByIdAndDelete(req.params.id)
 
-  res.json({
-    success: true
-  })
+    res.json({
+      success: true
+    })
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao excluir notícia'
+    })
+  }
+})
+
+// ======================
+// NEWS ORDER
+// ======================
+
+app.put('/api/news/order', authAdmin, async (req, res) => {
+  try {
+    const { news } = req.body
+
+    if (!Array.isArray(news)) {
+      return res.status(400).json({
+        error: 'Lista inválida'
+      })
+    }
+
+    for (let i = 0; i < news.length; i++) {
+      await News.findByIdAndUpdate(
+        news[i].id,
+        {
+          position: i + 1
+        }
+      )
+    }
+
+    res.json({
+      success: true
+    })
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao salvar ordem'
+    })
+  }
 })
 
 // ======================

@@ -33,29 +33,49 @@ function Admin({ adminSection }) {
   const [homeBannerFile, setHomeBannerFile] = useState(null)
 
   async function loadSettings() {
-    const response = await fetch(`${API_URL}/api/settings`)
-    const data = await response.json()
+    try {
+      const response = await fetch(`${API_URL}/api/settings`, {
+        cache: 'no-store'
+      })
 
-    setSettings({
-      siteName: data.siteName || 'COREGG',
-      siteSubtitle: data.siteSubtitle || 'ORGANIZAÇÃO DE E-SPORTS',
-      siteDescription: data.siteDescription || '',
-      homeButtonText: data.homeButtonText || 'Conheça a COREGG',
-      homeButtonLink: data.homeButtonLink || '/creators',
-      homeBannerImage: data.homeBannerImage || '',
-      discordLink: data.discordLink || '',
-      instagramLink: data.instagramLink || '',
-      tiktokLink: data.tiktokLink || '',
-      youtubeLink: data.youtubeLink || '',
-      contactEmail: data.contactEmail || ''
-    })
+      const data = await response.json()
+
+      setSettings({
+        siteName: data.siteName || 'COREGG',
+        siteSubtitle:
+          data.siteSubtitle || 'ORGANIZAÇÃO DE E-SPORTS',
+        siteDescription: data.siteDescription || '',
+        homeButtonText:
+          data.homeButtonText || 'Conheça a COREGG',
+        homeButtonLink:
+          data.homeButtonLink || '/creators',
+        homeBannerImage:
+          data.homeBannerImage || '',
+        discordLink: data.discordLink || '',
+        instagramLink: data.instagramLink || '',
+        tiktokLink: data.tiktokLink || '',
+        youtubeLink: data.youtubeLink || '',
+        contactEmail: data.contactEmail || ''
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   async function loadNews() {
-    const response = await fetch(`${API_URL}/api/news`)
-    const data = await response.json()
+    try {
+      const response = await fetch(`${API_URL}/api/news`, {
+        cache: 'no-store'
+      })
 
-    setNews(data)
+      const data = await response.json()
+
+      if (Array.isArray(data)) {
+        setNews(data)
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   useEffect(() => {
@@ -65,6 +85,7 @@ function Admin({ adminSection }) {
 
   function clearForm() {
     setEditingId(null)
+
     setTitle('')
     setCategory('')
     setDescription('')
@@ -73,12 +94,12 @@ function Admin({ adminSection }) {
   }
 
   function startEdit(item) {
-    setEditingId(item.id)
+    setEditingId(item._id)
 
-    setTitle(item.title)
-    setCategory(item.category)
-    setDescription(item.description)
-    setContent(item.content)
+    setTitle(item.title || '')
+    setCategory(item.category || '')
+    setDescription(item.description || '')
+    setContent(item.content || '')
 
     setImage(null)
 
@@ -93,18 +114,23 @@ function Admin({ adminSection }) {
 
     formData.append('image', file)
 
-    const response = await fetch(`${API_URL}/api/upload/home-image`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
-    })
+    const response = await fetch(
+      `${API_URL}/api/upload/home-image`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      }
+    )
 
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.error || 'Erro ao enviar imagem')
+      throw new Error(
+        data.error || 'Erro ao enviar imagem'
+      )
     }
 
     return data.image
@@ -117,7 +143,8 @@ function Admin({ adminSection }) {
       let updatedSettings = { ...settings }
 
       if (homeBannerFile) {
-        const uploadedImage = await uploadHomeImage(homeBannerFile)
+        const uploadedImage =
+          await uploadHomeImage(homeBannerFile)
 
         updatedSettings = {
           ...updatedSettings,
@@ -125,14 +152,17 @@ function Admin({ adminSection }) {
         }
       }
 
-      const response = await fetch(`${API_URL}/api/settings`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedSettings)
-      })
+      const response = await fetch(
+        `${API_URL}/api/settings`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedSettings)
+        }
+      )
 
       const data = await response.json()
 
@@ -142,6 +172,7 @@ function Admin({ adminSection }) {
       }
 
       setSettings(updatedSettings)
+
       setHomeBannerFile(null)
 
       alert('Banner atualizado!')
@@ -151,82 +182,101 @@ function Admin({ adminSection }) {
   }
 
   async function resetHomeBanner() {
-    const updatedSettings = {
-      ...settings,
-      homeBannerImage: ''
+    try {
+      const updatedSettings = {
+        ...settings,
+        homeBannerImage: ''
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/settings`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedSettings)
+        }
+      )
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert(data.error || 'Erro ao resetar banner')
+        return
+      }
+
+      setSettings(updatedSettings)
+
+      alert('Banner restaurado!')
+    } catch (error) {
+      console.error(error)
     }
-
-    const response = await fetch(`${API_URL}/api/settings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(updatedSettings)
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      alert(data.error || 'Erro ao resetar banner')
-      return
-    }
-
-    setSettings(updatedSettings)
-
-    alert('Banner restaurado!')
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
 
-    const formData = new FormData()
+    try {
+      const formData = new FormData()
 
-    formData.append('title', title)
-    formData.append('category', category)
-    formData.append('description', description)
-    formData.append('content', content)
+      formData.append('title', title)
+      formData.append('category', category)
+      formData.append('description', description)
+      formData.append('content', content)
 
-    if (image) {
-      formData.append('image', image)
+      if (image) {
+        formData.append('image', image)
+      }
+
+      let response
+
+      if (editingId) {
+        response = await fetch(
+          `${API_URL}/api/news/${editingId}`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
+            body: formData
+          }
+        )
+      } else {
+        response = await fetch(
+          `${API_URL}/api/news`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
+            body: formData
+          }
+        )
+      }
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert(data.error || 'Erro ao salvar notícia')
+        return
+      }
+
+      alert(
+        editingId
+          ? 'Notícia atualizada!'
+          : 'Notícia publicada!'
+      )
+
+      clearForm()
+
+      await loadNews()
+    } catch (error) {
+      console.error(error)
+
+      alert('Erro ao salvar notícia')
     }
-
-    let response
-
-    if (editingId) {
-      response = await fetch(`${API_URL}/api/news/${editingId}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      })
-    } else {
-      response = await fetch(`${API_URL}/api/news`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      })
-    }
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      alert(data.error || 'Erro ao salvar notícia')
-      return
-    }
-
-    alert(
-      editingId
-        ? 'Notícia atualizada!'
-        : 'Notícia publicada!'
-    )
-
-    clearForm()
-
-    await loadNews()
   }
 
   async function deleteNews(id) {
@@ -236,36 +286,51 @@ function Admin({ adminSection }) {
 
     if (!confirmDelete) return
 
-    const response = await fetch(`${API_URL}/api/news/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`
+    try {
+      const response = await fetch(
+        `${API_URL}/api/news/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert(data.error || 'Erro ao excluir notícia')
+        return
       }
-    })
 
-    const data = await response.json()
+      await loadNews()
 
-    if (!response.ok) {
-      alert(data.error || 'Erro ao excluir notícia')
-      return
+      alert('Notícia excluída!')
+    } catch (error) {
+      console.error(error)
+
+      alert('Erro ao excluir notícia')
     }
-
-    await loadNews()
-
-    alert('Notícia excluída!')
   }
 
   async function saveNewsOrder(updatedNews) {
-    await fetch(`${API_URL}/api/news/order`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        news: updatedNews
+    try {
+      await fetch(`${API_URL}/api/news/order`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          news: updatedNews.map((item) => ({
+            id: item._id
+          }))
+        })
       })
-    })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   async function moveNews(index, direction) {
@@ -278,7 +343,10 @@ function Admin({ adminSection }) {
       ]
     }
 
-    if (direction === 'down' && index < updatedNews.length - 1) {
+    if (
+      direction === 'down' &&
+      index < updatedNews.length - 1
+    ) {
       ;[updatedNews[index], updatedNews[index + 1]] = [
         updatedNews[index + 1],
         updatedNews[index]
@@ -292,87 +360,6 @@ function Admin({ adminSection }) {
 
   return (
     <div className="adminPage">
-      {adminSection === 'dashboard' && (
-        <div className="adminStats">
-          <div className="adminStatCard">
-            <span>Total de notícias</span>
-            <h2>{news.length}</h2>
-          </div>
-
-          <div className="adminStatCard">
-            <span>Status</span>
-            <h2>ONLINE</h2>
-          </div>
-
-          <div className="adminStatCard">
-            <span>Sistema</span>
-            <h2>CMS PREMIUM</h2>
-          </div>
-        </div>
-      )}
-
-      {adminSection === 'settings' && (
-        <div className="adminGrid">
-          <div className="adminBox">
-            <div className="adminBoxHeader">
-              <h3>Banner da Home</h3>
-            </div>
-
-            <form
-              className="adminForm"
-              onSubmit={saveHomeBanner}
-            >
-              <label className="customUpload">
-                <span>
-                  {homeBannerFile
-                    ? homeBannerFile.name
-                    : 'Selecionar banner'}
-                </span>
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) =>
-                    setHomeBannerFile(e.target.files[0])
-                  }
-                />
-              </label>
-
-              <button type="submit">
-                Salvar banner
-              </button>
-
-              <button
-                type="button"
-                className="cancelEditButton"
-                onClick={resetHomeBanner}
-              >
-                Restaurar padrão
-              </button>
-            </form>
-
-            <div className="adminBannerPreview">
-              {homeBannerFile ? (
-                <img
-                  src={URL.createObjectURL(homeBannerFile)}
-                  alt="preview"
-                />
-              ) : settings.homeBannerImage ? (
-                <img
-                  src={settings.homeBannerImage}
-                  alt="banner"
-                />
-              ) : (
-                <div className="adminEmpty">
-                  Banner padrão do site.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {adminSection === 'news' && (
         <div className="adminGrid">
           <div className="adminLeft">
@@ -468,23 +455,23 @@ function Admin({ adminSection }) {
               <div className="adminNewsList">
                 {news.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={item._id}
                     className="adminNewsItem"
                   >
-<img
-  src={
-    item.image
-      ? item.image.startsWith('http')
-        ? item.image
-        : `${API_URL}${item.image}`
-      : '/favicon.png'
-  }
-  alt={item.title}
-/>
+                    <img
+                      src={
+                        item.image
+                          ? item.image
+                          : '/favicon.png'
+                      }
+                      alt={item.title}
+                    />
 
                     <div className="adminNewsInfo">
                       <span>{item.category}</span>
+
                       <h4>{item.title}</h4>
+
                       <p>{item.description}</p>
                     </div>
 
@@ -521,7 +508,7 @@ function Admin({ adminSection }) {
                         className="deleteButton"
                         type="button"
                         onClick={() =>
-                          deleteNews(item.id)
+                          deleteNews(item._id)
                         }
                       >
                         Excluir
@@ -538,16 +525,6 @@ function Admin({ adminSection }) {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {adminSection === 'preview' && (
-        <div className="adminBox">
-          <iframe
-            className="adminPreview"
-            src="/"
-            title="COREGG Preview"
-          />
         </div>
       )}
     </div>
