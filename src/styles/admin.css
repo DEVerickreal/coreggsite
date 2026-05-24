@@ -1,3 +1,7 @@
+body {
+  background: red !important;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -524,4 +528,495 @@
   .adminNewsActions {
     flex-direction: row;
   }
+}
+
+/* =========================
+   ADMIN PAGE
+========================= */
+
+.adminPage {
+  width: 100%;
+}
+
+/* =========================
+   BOXES
+========================= */
+
+.adminBox {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(0,255,255,.06),
+      transparent 35%
+    ),
+    #050505;
+
+  border: 1px solid rgba(0,255,255,.08);
+
+  border-radius: 32px;
+
+  padding: 34px;
+
+  margin-bottom: 30px;
+
+  box-shadow:
+    0 0 40px rgba(0,0,0,.45);
+
+  animation: fadeAdmin .4s ease;
+}
+
+@keyframes fadeAdmin {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.adminBoxHeader {
+  margin-bottom: 28px;
+}
+
+.adminBoxHeader h3 {
+  font-size: 44px;
+  font-weight: 800;
+  color: white;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.adminGrid {
+  display: grid;
+
+  grid-template-columns:
+    420px
+    1fr;
+
+  gap: 28px;
+}
+
+.adminLeft,
+.adminRight {
+  width: 100%;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.adminStatsCard {
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.02),
+      rgba(0,255,255,.03)
+    );
+
+  border: 1px solid rgba(0,255,255,.08);
+
+  border-radius: 28px;
+
+  padding: 30px;
+
+  transition: .25s;
+}
+
+.adminStatsCard::before {
+  content: '';
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent,
+      rgba(0,255,255,.05),
+      transparent
+    );
+
+  opacity: 0;
+
+  transition: .3s;
+}
+
+.adminStatsCard:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(0,255,255,.25);
+
+  box-shadow:
+    0 0 30px rgba(0,255,255,.08);
+}
+
+.adminStatsCard:hover::before {
+  opacity: 1;
+}
+
+.adminStatsCard h2 {
+  font-size: 52px;
+  font-weight: 800;
+
+  color: #11dfff;
+
+  margin-bottom: 12px;
+}
+
+.adminStatsCard p {
+  color: #c7c7c7;
+
+  font-size: 15px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.adminForm {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.adminForm input,
+.adminForm textarea {
+  width: 100%;
+
+  background: #030303;
+
+  border: 1px solid rgba(255,255,255,.06);
+
+  border-radius: 18px;
+
+  padding: 18px 22px;
+
+  color: white;
+
+  font-size: 15px;
+
+  transition: .2s;
+}
+
+.adminForm textarea {
+  resize: vertical;
+  min-height: 180px;
+}
+
+.adminForm input:focus,
+.adminForm textarea:focus {
+  outline: none;
+
+  border-color: #11dfff;
+
+  box-shadow:
+    0 0 0 4px rgba(17,223,255,.12);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.adminForm button,
+.editButton,
+.deleteButton,
+.moveButton {
+  border: none;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.adminForm button {
+  height: 58px;
+
+  border-radius: 18px;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.adminForm button[type='submit'] {
+  background: #11dfff;
+  color: black;
+}
+
+.adminForm button[type='submit']:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 0 25px rgba(17,223,255,.25);
+}
+
+.cancelEditButton {
+  background: transparent !important;
+
+  border: 1px solid rgba(255,0,0,.18) !important;
+
+  color: #ff6565 !important;
+}
+
+.cancelEditButton:hover {
+  background: rgba(255,0,0,.08) !important;
+}
+
+/* =========================
+   CUSTOM UPLOAD
+========================= */
+
+.customUpload {
+  width: 100%;
+
+  height: 62px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 22px;
+
+  background: #030303;
+
+  border: 1px dashed rgba(0,255,255,.2);
+
+  border-radius: 18px;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.customUpload:hover {
+  border-color: #11dfff;
+
+  background: rgba(0,255,255,.04);
+}
+
+.customUpload span {
+  color: #d7d7d7;
+}
+
+/* =========================
+   NEWS LIST
+========================= */
+
+.adminNewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.adminNewsItem {
+  display: flex;
+  gap: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.015),
+      rgba(0,255,255,.02)
+    );
+
+  border: 1px solid rgba(255,255,255,.05);
+
+  border-radius: 24px;
+
+  padding: 18px;
+
+  transition: .25s;
+}
+
+.adminNewsItem:hover {
+  border-color: rgba(0,255,255,.2);
+
+  transform: translateY(-2px);
+}
+
+.adminNewsItem img {
+  width: 120px;
+  height: 120px;
+
+  object-fit: cover;
+
+  border-radius: 18px;
+}
+
+.adminNewsInfo {
+  flex: 1;
+}
+
+.adminNewsInfo span {
+  color: #11dfff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.adminNewsInfo h4 {
+  margin-top: 8px;
+  margin-bottom: 10px;
+
+  font-size: 22px;
+
+  color: white;
+}
+
+.adminNewsInfo p {
+  color: #b8b8b8;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.adminNewsActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.moveButton {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,.04);
+
+  color: white;
+}
+
+.moveButton:hover {
+  background: rgba(0,255,255,.12);
+}
+
+.editButton {
+  height: 42px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  background: #11dfff;
+
+  color: black;
+
+  font-weight: 700;
+}
+
+.editButton:hover {
+  transform: scale(1.03);
+}
+
+.deleteButton {
+  height: 42px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  background: rgba(255,0,0,.08);
+
+  border: 1px solid rgba(255,0,0,.2);
+
+  color: #ff6a6a;
+
+  font-weight: 700;
+}
+
+.deleteButton:hover {
+  background: rgba(255,0,0,.16);
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.adminEmpty {
+  padding: 40px;
+
+  text-align: center;
+
+  color: #888;
+
+  border: 1px dashed rgba(255,255,255,.08);
+
+  border-radius: 22px;
+}
+
+/* =========================
+   PREVIEW
+========================= */
+
+.adminBox iframe,
+.adminBox .home {
+  border-radius: 24px;
+}
+
+.adminBox .hero {
+  min-height: auto !important;
+}
+
+.adminBox .homeNewsSection {
+  padding-bottom: 50px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width: 1200px) {
+
+  .adminGrid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media(max-width: 768px) {
+
+  .adminBox {
+    padding: 24px;
+  }
+
+  .adminBoxHeader h3 {
+    font-size: 34px;
+  }
+
+  .adminNewsItem {
+    flex-direction: column;
+  }
+
+  .adminNewsItem img {
+    width: 100%;
+    height: 220px;
+  }
+
+  .adminNewsActions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
 }
