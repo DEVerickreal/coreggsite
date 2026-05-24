@@ -11,6 +11,7 @@ function NewsDetails() {
 
   const [news, setNews] = useState([])
   const [article, setArticle] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   function formatDate(value) {
     if (!value) return ''
@@ -20,29 +21,58 @@ function NewsDetails() {
 
   async function loadNews() {
     try {
-      const response = await fetch(`${API_URL}/api/news`, {
-        cache: 'no-store'
-      })
+      setLoading(true)
+
+      const response = await fetch(
+        `${API_URL}/api/news/${id}?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
+      )
 
       const data = await response.json()
 
-      if (!Array.isArray(data)) return
+      if (!response.ok) {
+        setArticle(null)
+        return
+      }
 
-      setNews(data)
+      setArticle(data)
 
-      const selectedArticle = data.find(
-        (item) => String(item._id) === String(id)
+      const allNewsResponse = await fetch(
+        `${API_URL}/api/news?t=${Date.now()}`,
+        {
+          cache: 'no-store'
+        }
       )
 
-      setArticle(selectedArticle || null)
+      const allNews = await allNewsResponse.json()
+
+      if (Array.isArray(allNews)) {
+        setNews(allNews)
+      }
+
     } catch (error) {
       console.error(error)
+      setArticle(null)
+    } finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
     loadNews()
   }, [id])
+
+  if (loading) {
+    return (
+      <PageTransition>
+        <div className="newsDetailsPage">
+          <h1>Carregando notícia...</h1>
+        </div>
+      </PageTransition>
+    )
+  }
 
   if (!article) {
     return (
