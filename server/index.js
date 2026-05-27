@@ -69,6 +69,7 @@ mongoose.connect(process.env.MONGO_URI)
 // ======================
 
 cloudinary.config({
+
   cloud_name:
     process.env.CLOUDINARY_CLOUD_NAME,
 
@@ -77,6 +78,7 @@ cloudinary.config({
 
   api_secret:
     process.env.CLOUDINARY_API_SECRET
+
 })
 
 // ======================
@@ -438,6 +440,98 @@ app.get('/api/news', async (req, res) => {
 
 })
 
+// ======================
+// NEWS ORDER
+// IMPORTANTE:
+// ESTA ROTA PRECISA VIR
+// ANTES DE /api/news/:id
+// ======================
+
+app.put(
+  '/api/news/order',
+  authAdmin,
+  async (req, res) => {
+
+    try {
+
+      const news = req.body.news
+
+      console.log('ORDER RECEBIDA:')
+      console.log(news)
+
+      if (!news || !Array.isArray(news)) {
+
+        return res.status(400).json({
+          error: 'Lista inválida'
+        })
+
+      }
+
+      for (let i = 0; i < news.length; i++) {
+
+        const item = news[i]
+
+        if (
+          !item ||
+          !item.id
+        ) {
+
+          console.log(
+            'ITEM INVÁLIDO:'
+          )
+
+          console.log(item)
+
+          continue
+        }
+
+        if (
+          !mongoose.Types.ObjectId.isValid(
+            item.id
+          )
+        ) {
+
+          console.log(
+            'ID INVÁLIDO:'
+          )
+
+          console.log(item.id)
+
+          continue
+        }
+
+        await News.findByIdAndUpdate(
+          item.id,
+          {
+            $set: {
+              position: i + 1
+            }
+          }
+        )
+
+      }
+
+      return res.json({
+        success: true
+      })
+
+    } catch (error) {
+
+      console.log(
+        'ERRO AO SALVAR ORDEM:'
+      )
+
+      console.log(error)
+
+      return res.status(500).json({
+        error: 'Erro ao salvar ordem'
+      })
+
+    }
+
+  }
+)
+
 app.get('/api/news/:id', async (req, res) => {
 
   try {
@@ -644,69 +738,6 @@ app.delete(
 
   }
 )
-
-// ======================
-// NEWS ORDER
-// ======================
-
-app.put('/api/news/order', authAdmin, async (req, res) => {
-
-  try {
-
-    const news = req.body.news
-
-    console.log('ORDER RECEBIDA:')
-    console.log(news)
-
-    if (!news || !Array.isArray(news)) {
-
-      return res.status(400).json({
-        error: 'Lista inválida'
-      })
-
-    }
-
-    for (let i = 0; i < news.length; i++) {
-
-      const item = news[i]
-
-      // validação extra
-      if (!item.id) {
-
-        console.log('ITEM INVÁLIDO:')
-        console.log(item)
-
-        continue
-      }
-
-      await News.findByIdAndUpdate(
-        item.id,
-        {
-          position: i + 1
-        },
-        {
-          new: true
-        }
-      )
-
-    }
-
-    return res.json({
-      success: true
-    })
-
-  } catch (error) {
-
-    console.log('ERRO AO SALVAR ORDEM:')
-    console.log(error)
-
-    return res.status(500).json({
-      error: 'Erro ao salvar ordem'
-    })
-
-  }
-
-})
 
 // ======================
 // CONTACT / DISCORD
