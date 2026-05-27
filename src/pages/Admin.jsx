@@ -889,32 +889,31 @@ function Admin({ adminSection }) {
 
                       <div className="adminNewsActions">
 
-                        <button
-                          className="moveButton"
-                          type="button"
-                          onClick={() =>
-                            moveNews(
-                              index,
-                              'up'
-                            )
-                          }
-                        >
-                          ↑
-                        </button>
+                     <button
+  className="moveButton"
+  type="button"
+  onClick={(e) => {
+    e.preventDefault()
+    e.stopPropagation()
 
-                        <button
-                          className="moveButton"
-                          type="button"
-                          onClick={() =>
-                            moveNews(
-                              index,
-                              'down'
-                            )
-                          }
-                        >
-                          ↓
-                        </button>
+    moveNews(index, 'up')
+  }}
+>
+  ↑
+</button>
 
+<button
+  className="moveButton"
+  type="button"
+  onClick={(e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    moveNews(index, 'down')
+  }}
+>
+  ↓
+</button>
                         <button
                           className="editButton"
                           type="button"
