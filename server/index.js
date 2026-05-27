@@ -649,64 +649,50 @@ app.delete(
 // NEWS ORDER
 // ======================
 
-app.put(
-  '/api/news/order',
-  authAdmin,
-  async (req, res) => {
+app.put('/api/news/order', authAdmin, async (req, res) => {
 
-    try {
+  try {
 
-      const { news } = req.body
+    const { news } = req.body
 
-      if (!Array.isArray(news)) {
+    if (!Array.isArray(news)) {
 
-        return res.status(400).json({
-          error: 'Lista inválida'
-        })
-
-      }
-
-      for (
-        let i = 0;
-        i < news.length;
-        i++
-      ) {
-
-        await News.findByIdAndUpdate(
-
-          news[i].id,
-
-          {
-            position: i + 1
-          }
-
-        )
-
-      }
-
-      const reorderedNews =
-        await News.find()
-          .sort({
-            position: 1
-          })
-
-      res.json({
-        success: true,
-        news: reorderedNews
-      })
-
-    } catch (error) {
-
-      console.log(error)
-
-      res.status(500).json({
-        error: 'Erro ao salvar ordem'
+      return res.status(400).json({
+        error: 'Lista inválida'
       })
 
     }
 
+    for (let i = 0; i < news.length; i++) {
+
+      const item = news[i]
+
+      if (!item.id) continue
+
+      await News.findByIdAndUpdate(
+        item.id,
+        {
+          position: i + 1
+        }
+      )
+
+    }
+
+    res.json({
+      success: true
+    })
+
+  } catch (error) {
+
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao salvar ordem'
+    })
+
   }
-)
+
+})
 
 // ======================
 // CONTACT / DISCORD

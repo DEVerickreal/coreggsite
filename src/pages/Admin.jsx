@@ -456,59 +456,58 @@ function Admin({ adminSection }) {
   }
 
   async function saveNewsOrder(
-    updatedNews
-  ) {
+  updatedNews
+) {
 
-    try {
+  try {
 
-      const response = await fetch(
-        `${API_URL}/api/news/order`,
-        {
-          method: 'PUT',
+    const response = await fetch(
+      `${API_URL}/api/news/order`,
+      {
+        method: 'PUT',
 
-          headers: {
-            'Content-Type':
-              'application/json',
+        headers: {
+          'Content-Type':
+            'application/json',
 
-            Authorization:
-              `Bearer ${token}`
-          },
+          Authorization:
+            `Bearer ${token}`
+        },
 
-          body: JSON.stringify({
-            news: updatedNews.map(
-              (item, index) => ({
-                id: item._id,
-                position: index + 1
-              })
-            )
-          })
-        }
-      )
-
-      const data = await response.json()
-
-      if (!response.ok) {
-
-        alert(
-          data.error ||
-          'Erro ao salvar ordem'
-        )
-
-        return false
-
+        body: JSON.stringify({
+          news: updatedNews.map(
+            (item) => ({
+              id: item._id
+            })
+          )
+        })
       }
+    )
 
-      return true
+    const data = await response.json()
 
-    } catch (error) {
+    if (!response.ok) {
 
-      console.error(error)
+      alert(
+        data.error ||
+        'Erro ao salvar ordem'
+      )
 
       return false
 
     }
 
+    return true
+
+  } catch (error) {
+
+    console.error(error)
+
+    return false
+
   }
+
+}
 
   async function moveNews(
     index,
@@ -563,7 +562,403 @@ function Admin({ adminSection }) {
   return (
     <div className="adminPage">
 
-      {/* restante do JSX continua igual */}
+      {adminSection === 'dashboard' && (
+        <div className="adminBox">
+
+          <div className="adminBoxHeader">
+            <h3>Dashboard</h3>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fit,minmax(220px,1fr))',
+              gap: '20px'
+            }}
+          >
+
+            <div className="adminStatsCard">
+              <h2>{news.length}</h2>
+              <p>Total de notícias</p>
+            </div>
+
+            <div className="adminStatsCard">
+              <h2>
+                {
+                  news.filter(
+                    (item) =>
+                      item.featured === 1
+                  ).length
+                }
+              </h2>
+
+              <p>Notícias destaque</p>
+            </div>
+
+            <div className="adminStatsCard">
+              <h2>
+                {news.reduce(
+                  (acc, item) =>
+                    acc +
+                    (item.views || 0),
+                  0
+                )}
+              </h2>
+
+              <p>Total de visualizações</p>
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {adminSection === 'settings' && (
+        <div className="adminBox">
+
+          <div className="adminBoxHeader">
+            <h3>Home / Destaques</h3>
+          </div>
+
+          <form
+            className="adminForm"
+            onSubmit={saveHomeBanner}
+          >
+
+            <input
+              type="text"
+              placeholder="Nome do site"
+              value={settings.siteName}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  siteName:
+                    e.target.value
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Subtítulo"
+              value={
+                settings.siteSubtitle
+              }
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  siteSubtitle:
+                    e.target.value
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Texto do botão"
+              value={
+                settings.homeButtonText
+              }
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  homeButtonText:
+                    e.target.value
+                })
+              }
+            />
+
+            <label className="customUpload">
+
+              <span>
+                {homeBannerFile
+                  ? homeBannerFile.name
+                  : 'Selecionar banner'}
+              </span>
+
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) =>
+                  setHomeBannerFile(
+                    e.target.files[0]
+                  )
+                }
+              />
+
+            </label>
+
+            <button type="submit">
+              Salvar alterações
+            </button>
+
+            <button
+              type="button"
+              className="cancelEditButton"
+              onClick={
+                resetHomeBanner
+              }
+            >
+              Restaurar banner
+            </button>
+
+          </form>
+
+        </div>
+      )}
+
+      {adminSection === 'preview' && (
+        <div className="adminBox">
+
+          <div className="adminBoxHeader">
+            <h3>Prévia do site</h3>
+          </div>
+
+          <div
+            style={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              border:
+                '1px solid rgba(255,255,255,.08)'
+            }}
+          >
+            <Home />
+          </div>
+
+        </div>
+      )}
+
+      {adminSection === 'news' && (
+        <div className="adminGrid">
+
+          <div className="adminLeft">
+
+            <div className="adminBox">
+
+              <div className="adminBoxHeader">
+                <h3>
+                  {editingId
+                    ? 'Editar notícia'
+                    : 'Nova notícia'}
+                </h3>
+              </div>
+
+              <form
+                className="adminForm"
+                onSubmit={handleSubmit}
+              >
+
+                <input
+                  type="text"
+                  placeholder="Título"
+                  value={title}
+                  onChange={(e) =>
+                    setTitle(
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+                <input
+                  type="text"
+                  placeholder="Categoria"
+                  value={category}
+                  onChange={(e) =>
+                    setCategory(
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+                <textarea
+                  placeholder="Descrição"
+                  value={description}
+                  onChange={(e) =>
+                    setDescription(
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+                <textarea
+                  placeholder="Conteúdo"
+                  value={content}
+                  onChange={(e) =>
+                    setContent(
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+                <label className="customUpload">
+
+                  <span>
+                    {image
+                      ? image.name
+                      : 'Selecionar imagem'}
+                  </span>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(e) =>
+                      setImage(
+                        e.target.files[0]
+                      )
+                    }
+                  />
+
+                </label>
+
+                <button type="submit">
+                  {editingId
+                    ? 'Salvar alterações'
+                    : 'Publicar notícia'}
+                </button>
+
+                {editingId && (
+                  <button
+                    type="button"
+                    className="cancelEditButton"
+                    onClick={
+                      clearForm
+                    }
+                  >
+                    Cancelar edição
+                  </button>
+                )}
+
+              </form>
+
+            </div>
+
+          </div>
+
+          <div className="adminRight">
+
+            <div className="adminBox">
+
+              <div className="adminNewsList">
+
+                {news.map(
+                  (item, index) => (
+                    <div
+                      key={item._id}
+                      className="adminNewsItem"
+                    >
+
+                      <img
+                        src={
+                          item.image
+                            ? item.image
+                            : '/favicon.png'
+                        }
+                        alt={
+                          item.title
+                        }
+                      />
+
+                      <div className="adminNewsInfo">
+
+                        <span>
+                          {
+                            item.category
+                          }
+                        </span>
+
+                        <h4>
+                          {
+                            item.title
+                          }
+                        </h4>
+
+                        <p>
+                          {
+                            item.description
+                          }
+                        </p>
+
+                      </div>
+
+                      <div className="adminNewsActions">
+
+                        <button
+                          className="moveButton"
+                          type="button"
+                          onClick={() =>
+                            moveNews(
+                              index,
+                              'up'
+                            )
+                          }
+                        >
+                          ↑
+                        </button>
+
+                        <button
+                          className="moveButton"
+                          type="button"
+                          onClick={() =>
+                            moveNews(
+                              index,
+                              'down'
+                            )
+                          }
+                        >
+                          ↓
+                        </button>
+
+                        <button
+                          className="editButton"
+                          type="button"
+                          onClick={() =>
+                            startEdit(
+                              item
+                            )
+                          }
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          className="deleteButton"
+                          type="button"
+                          onClick={() =>
+                            deleteNews(
+                              item._id
+                            )
+                          }
+                        >
+                          Excluir
+                        </button>
+
+                      </div>
+
+                    </div>
+                  )
+                )}
+
+                {news.length === 0 && (
+                  <div className="adminEmpty">
+                    Nenhuma notícia cadastrada.
+                  </div>
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   )
