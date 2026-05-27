@@ -653,9 +653,11 @@ app.put('/api/news/order', authAdmin, async (req, res) => {
 
   try {
 
-    const { news } = req.body
+    console.log(req.body)
 
-    if (!Array.isArray(news)) {
+    const news = req.body.news
+
+    if (!news || !Array.isArray(news)) {
 
       return res.status(400).json({
         error: 'Lista inválida'
@@ -667,26 +669,27 @@ app.put('/api/news/order', authAdmin, async (req, res) => {
 
       const item = news[i]
 
-      if (!item.id) continue
-
       await News.findByIdAndUpdate(
         item.id,
         {
-          position: i + 1
+          $set: {
+            position: i + 1
+          }
         }
       )
 
     }
 
-    res.json({
+    return res.json({
       success: true
     })
 
   } catch (error) {
 
+    console.log('ERRO ORDER:')
     console.log(error)
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Erro ao salvar ordem'
     })
 
