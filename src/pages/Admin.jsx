@@ -455,11 +455,18 @@ function Admin({ adminSection }) {
 
   }
 
-  async function saveNewsOrder(
-  updatedNews
-) {
+ async function saveNewsOrder(updatedNews) {
 
   try {
+
+    const formattedNews = updatedNews
+      .filter((item) => item && item._id)
+      .map((item) => ({
+        id: String(item._id)
+      }))
+
+    console.log('ENVIANDO ORDEM:')
+    console.log(formattedNews)
 
     const response = await fetch(
       `${API_URL}/api/news/order`,
@@ -467,19 +474,14 @@ function Admin({ adminSection }) {
         method: 'PUT',
 
         headers: {
-          'Content-Type':
-            'application/json',
+          'Content-Type': 'application/json',
 
           Authorization:
             `Bearer ${token}`
         },
 
         body: JSON.stringify({
-          news: updatedNews.map(
-            (item) => ({
-              id: item._id
-            })
-          )
+          news: formattedNews
         })
       }
     )
