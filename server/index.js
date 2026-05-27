@@ -653,9 +653,10 @@ app.put('/api/news/order', authAdmin, async (req, res) => {
 
   try {
 
-    console.log(req.body)
-
     const news = req.body.news
+
+    console.log('ORDER RECEBIDA:')
+    console.log(news)
 
     if (!news || !Array.isArray(news)) {
 
@@ -669,12 +670,22 @@ app.put('/api/news/order', authAdmin, async (req, res) => {
 
       const item = news[i]
 
+      // validação extra
+      if (!item.id) {
+
+        console.log('ITEM INVÁLIDO:')
+        console.log(item)
+
+        continue
+      }
+
       await News.findByIdAndUpdate(
         item.id,
         {
-          $set: {
-            position: i + 1
-          }
+          position: i + 1
+        },
+        {
+          new: true
         }
       )
 
@@ -686,7 +697,7 @@ app.put('/api/news/order', authAdmin, async (req, res) => {
 
   } catch (error) {
 
-    console.log('ERRO ORDER:')
+    console.log('ERRO AO SALVAR ORDEM:')
     console.log(error)
 
     return res.status(500).json({
