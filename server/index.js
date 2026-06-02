@@ -843,13 +843,21 @@ app.post('/api/contact', async (req, res) => {
         }
       )
 
-    if (!response.ok) {
+   if (!response.ok) {
 
-      return res.status(500).json({
-        error: 'Erro ao enviar webhook'
-      })
+  const discordError =
+    await response.text()
 
-    }
+  console.log(
+    'ERRO DISCORD:',
+    discordError
+  )
+
+  return res.status(500).json({
+    error: discordError
+  })
+
+}
 
     res.json({
       success: true
