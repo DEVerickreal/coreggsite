@@ -3,6 +3,7 @@ import Reveal from '../components/Reveal'
 
 import exitlagLogo from '../assets/exitlag.png'
 import ifynnaLogo from '../assets/ifynna.png'
+import paraibadocorte from '../assets/paraibadocorte.png'
 import maisVidaLogo from '../assets/maisvida.png'
 
 import API_URL from '../api'
@@ -99,6 +100,47 @@ function Partners() {
             </div>
           </div>
         </Reveal>
+{/* PARAÍBA DO CORTE */}
+<Reveal delay={0.08}>
+  <div className="partnerHeroCard">
+    <div className="partnerHeroContent">
+      <span className="partnerBadge">
+        Parceira Oficial
+      </span>
+
+      <h2>PARAÍBA DO CORTE</h2>
+
+      <h3>
+        Barbearia parceira da COREGG
+      </h3>
+
+      <p>
+        Com anos de experiência no mercado, a Paraíba do Corte
+        é uma barbearia especializada que apoia o projeto da
+        COREGG e acredita no crescimento dos eSports. Sempre
+        pronta para atender torcedores, colaboradores e toda
+        a comunidade da organização com qualidade, estilo e
+        atendimento diferenciado.
+      </p>
+
+      <a
+        href="https://www.instagram.com/barbeariaparaibadocorte/"
+        target="_blank"
+        rel="noreferrer"
+        className="partnerButton"
+      >
+        Conhecer parceiro
+      </a>
+    </div>
+
+    <div className="partnerHeroLogo">
+      <img
+        src={paraibaDoCorteLogo}
+        alt="Paraíba do Corte"
+      />
+    </div>
+  </div>
+</Reveal>
 
         {/* Projeto Mais Vida */}
         <Reveal delay={0.2}>
