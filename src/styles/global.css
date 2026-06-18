@@ -2407,11 +2407,3 @@ transform: translateY(-50%);
 .noticia-texto {
   white-space: pre-line;
 }
-
-/* LOGO PARAÍBA DO CORTE */
-.paraibaLogo img {
-  max-width: 600px !important;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-}
