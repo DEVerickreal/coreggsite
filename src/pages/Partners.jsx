@@ -133,7 +133,7 @@ function Partners() {
       </a>
     </div>
 
-    <div className="partnerHeroLogo">
+    <div className="partnerHeroLogo paraibaLogo">
       <img
         src={paraibaDoCorteLogo}
         alt="Paraíba do Corte"

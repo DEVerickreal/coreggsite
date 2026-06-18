@@ -2410,7 +2410,7 @@ transform: translateY(-50%);
 
 /* LOGO PARAÍBA DO CORTE */
 .paraibaLogo img {
-  max-width: 500px !important;
+  max-width: 600px !important;
   width: 100%;
   height: auto;
   object-fit: contain;
