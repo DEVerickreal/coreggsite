@@ -3,7 +3,7 @@ import Reveal from '../components/Reveal'
 
 import exitlagLogo from '../assets/exitlag.png'
 import ifynnaLogo from '../assets/ifynna.png'
-import paraibadocorte from '../assets/paraibadocorte.png'
+import paraibaDoCorteLogo from '../assets/paraibadocorte.png'
 import maisVidaLogo from '../assets/maisvida.png'
 
 import API_URL from '../api'
