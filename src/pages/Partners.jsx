@@ -1,6 +1,7 @@
 import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
 
+import exitlagLogo from '../assets/exitlag.png'
 import ifynnaLogo from '../assets/ifynna.png'
 import maisVidaLogo from '../assets/maisvida.png'
 
@@ -19,6 +20,46 @@ function Partners() {
             </p>
           </div>
         </Reveal>
+
+        {/* EXITLAG */}
+<Reveal delay={0.05}>
+  <div className="partnerHeroCard">
+    <div className="partnerHeroContent">
+      <span className="partnerBadge">
+        Patrocinadora Principal
+      </span>
+
+      <h2>EXITLAG</h2>
+
+      <h3>  
+        Parceira oficial da COREGG
+      </h3>
+
+      <p>
+        A ExitLag é referência mundial em otimização de conexão
+        para jogos online, oferecendo menor latência, maior
+        estabilidade e melhor desempenho competitivo para
+        jogadores e organizações de e-sports.
+      </p>
+
+      <a
+        href="https://www.instagram.com/exitlagbrasil/"
+        target="_blank"
+        rel="noreferrer"
+        className="partnerButton"
+      >
+        Conhecer parceiro
+      </a>
+    </div>
+
+    <div className="partnerHeroLogo">
+      <img
+        src={exitlagLogo}
+        alt="ExitLag"
+      />
+    </div>
+  </div>
+</Reveal>
 
         {/* IFYNNA */}
         <Reveal delay={0.1}>
