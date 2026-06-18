@@ -115,7 +115,7 @@ function Partners() {
       </h3>
 
       <p>
-        Com anos de experiência no mercado, a Paraíba do Corte
+        Com anos de experiência no mercado, Paraíba do Corte
         é uma barbearia especializada que apoia o projeto da
         COREGG e acredita no crescimento dos eSports. Sempre
         pronta para atender torcedores, colaboradores e toda
